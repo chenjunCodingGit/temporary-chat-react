@@ -1,0 +1,109 @@
+# 项目构建产物
+/dist
+/build
+/.cache
+/.tmp
+/.next
+/.expo
+
+# 依赖管理
+/node_modules
+/.pnpm-debug.log
+/.yarn
+/.npm
+/.yarnrc.yml
+/.pnpm-lock.yaml
+/package-lock.json
+/yarn.lock
+
+# 开发环境配置
+.npmrc
+.yarnrc
+/.yarnrc
+/.npmrc
+/.yarnrc.yml
+/.pnpm-lock.yaml
+
+# 编辑器配置
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+*.swp
+*.swo
+.DS_Store
+*.tmp
+*.bak
+.REMOTE
+.Database
+_database
+_server
+
+# 日志与调试
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+pnpm-error.log*
+*.log
+coverage/
+jest-coverage/
+istanbul-reports/
+
+# 浏览器构建产物
+/.browserslistrc
+/.eslintrc.js
+/.prettierrc
+/.stylelintrc
+/.eslintrc.json
+/.eslintrc.cjs
+/.eslintrc.yml
+/.prettierrc.js
+/.prettierrc.yml
+/.prettierrc.json
+
+# 开发工具缓存
+/.cache
+/.swell
+/.vercel
+/.vercel_output
+/.vercel.json
+/.vercelignore
+/.vercelignore
+/.vercelignore
+/.vercelignore
+/.vercelignore
+
+# 测试相关
+__tests__/
+coverage/
+.nyc_output
+.mocha/
+
+# Docker相关
+Dockerfile
+.dockerignore
+/docker-compose.yml
+
+# 其他
+/.github/
+/.husky
+/.lint-staged
+/.vscode-test
+/.vscode-task
+/.vscode-settings
+/.vscode-extensions
+/.vscode-workspace
+/.vscode-workspace.json
+/.vscode/extensions.json
+/.vscode/tasks.json
+/.vscode/settings.json
+/.vscode/keybindings.json
+/.vscode/launch.json
+/.vscode/debugger.json
+/.vscode/extensions.json
+/.vscode/tasks.json
+/.vscode/settings.json
+/.vscode/keybindings.json
+/.vscode/launch.json
+/.vscode/debugger.json
