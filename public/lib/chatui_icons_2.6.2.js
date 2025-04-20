@@ -24,4 +24,3 @@
       ready(appendSvg);
     }
   })(document);
-  解释
