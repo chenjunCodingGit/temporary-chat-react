@@ -1,0 +1,46 @@
+/* src/styles/ChatDialog.module.css */
+.chatDialogWrapper {
+	position: fixed;
+	bottom: 24px;
+	right: -300px;
+	/* 初始位置在屏幕外 */
+	width: 380px;
+	box-shadow: 0 11px 18px 0 hsla(0, 0%, 75%, .7);
+	height: calc(100vh - 40px - 24px);
+
+	background-color: rgba(157, 145, 145, 0.8);
+	transition: right 0.3s ease-in-out;
+}
+
+.chatDialogWrapper.open {
+	right: 20px;
+	/* 弹出到屏幕内 */
+}
+
+.chatDialog {
+	position: relative;
+	height: calc(100vh - 40px - 24px);
+	color: white;
+	box-sizing: border-box;
+}
+
+.closeBtn {
+	position: absolute;
+	top: 10px;
+	right: 10px;
+	background: none;
+	border: none;
+	color: white;
+	font-size: 20px;
+	cursor: pointer;
+}
+
+.chatContent {
+	overflow-y: auto;
+	height: calc(100% - 60px);
+	/* 减去按钮和padding的高度 */
+}
+
+.navbarStyle {
+	background: #FFFFFF !important;
+}
