@@ -3,6 +3,8 @@ import ChatDialog from './components/ChatDialog';
 import aiChatSVG from './assets/ai-chat.svg';
 import styles from './App.module.css';
 
+const { VITE_APP_TITLE } = import.meta.env;
+
 export default function () {
   const [isChatOpen, setIsChatOpen] = useState(false);
 
@@ -12,6 +14,7 @@ export default function () {
 
   return (
     <div className={styles.App}>
+      <div>{VITE_APP_TITLE}</div>
       {
         !isChatOpen && (
           <img className={styles["float-play-btn"]} onClick={toggleChat} src={aiChatSVG} alt="ChatBot AI" />
