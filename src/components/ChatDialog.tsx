@@ -102,7 +102,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
               style={{ textAlign: 'left' }}
               content={content.text} />{
               msg.position === 'left' ?
-                <div style={{ position: 'relative', left: '-40px' }}>
+                <div style={{ position: 'relative', left: '-40px', top: '2px' }}>
                   <RateActions
                     upTitle="Like"
                     downTitle="Unlike"
