@@ -1,8 +1,9 @@
 // src/components/ChatDialog.tsx
 import React, { useState, useEffect } from 'react';
-import Chat, { Icon, IconButton, Bubble, useMessages, RateActions } from '@chatui/core';
+import Chat, { Icon, IconButton, Bubble, useMessages } from '@chatui/core';
 import chatbotAvatarSVG from '../assets/chatbot-avatar.svg';
 import styles from '../styles/ChatDialog.module.css';
+import { RateActions } from './RateActions'
 
 const initialMessages = [
   {
