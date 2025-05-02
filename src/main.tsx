@@ -2,7 +2,7 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App.tsx'
-import '@chatui/core/dist/index.css';
+import './lib/chatui/core/dist/index.css';
 import './styles/chatui-theme.css'
 
 const sleep = (ms: number | undefined) => new Promise(resolve => setTimeout(resolve, ms));

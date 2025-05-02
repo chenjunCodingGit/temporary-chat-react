@@ -1,7 +1,8 @@
 import React, { useRef } from 'react';
 // import { useNavigate } from 'react-router-dom';
 import { marked } from 'marked';
-import Chat, { MessageProps, useMessages, Bubble, Typing, TypingBubble } from '@chatui/core';
+// @ts-ignore
+import Chat, { MessageProps, useMessages, Bubble, Typing, TypingBubble } from '../lib/chatui/index';
 
 const mockContent = `
 以下是杭州适合周末游玩的3个推荐地点，兼顾自然风光、文化底蕴和休闲体验，基于提供的资料整理：

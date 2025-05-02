@@ -1,7 +1,16 @@
-import React from 'react';
+import React, { ReactNode } from 'react';
 import { DemoPage } from './DemoPage';
 import { DemoSection } from './DemoSection';
-import { Bubble } from '@chatui/core';
+// @ts-ignore
+import { Bubble } from '../lib/chatui/index';
+
+interface BubbleProps {
+  type?: 'text' | 'image';
+  content?: string;
+  children?: ReactNode;
+}
+
+// export declare const Bubble: React.FC<BubbleProps>;
 
 export default () => (
   <DemoPage>
