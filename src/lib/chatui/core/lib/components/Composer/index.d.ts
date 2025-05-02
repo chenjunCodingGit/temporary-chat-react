@@ -16,6 +16,11 @@ export type ComposerProps = {
     recorder?: RecorderProps;
     onSend: (type: string, content: string) => void;
     onImageSend?: (file: File) => Promise<any>;
+    onFileSelected?: (file: File, fileInfo: {
+        name: string;
+        extension: string;
+        size: number;
+    }) => void;
     onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
     onChange?: (value: string, event: React.ChangeEvent<Element>) => void;
     onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;

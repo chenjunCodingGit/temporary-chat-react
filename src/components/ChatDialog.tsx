@@ -1,8 +1,8 @@
 // src/components/ChatDialog.tsx
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
-import Chat, { Icon, IconButton, Bubble, useMessages, FileCard } from '../lib/src/index';
-// import Chat, { Icon, IconButton, Bubble, useMessages } from '../lib/chatui/core/es/index';
+import Chat, { Icon, IconButton, Bubble, useMessages, FileCard } from '../lib/chatui/core/es/index';
+// import Chat, { Icon, IconButton, Bubble, useMessages, FileCard } from '../lib/src/index';
 import chatbotAvatarSVG from '../assets/chatbot-avatar.svg';
 import styles from '../styles/ChatDialog.module.css';
 import { RateActions } from './RateActions'

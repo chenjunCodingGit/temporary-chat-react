@@ -41,6 +41,7 @@ export var Chat = /*#__PURE__*/React.forwardRef(function (props, ref) {
     onInputBlur = props.onInputBlur,
     onSend = props.onSend,
     onImageSend = props.onImageSend,
+    onFileSelected = props.onFileSelected,
     inputOptions = props.inputOptions,
     composerRef = props.composerRef,
     inputType = props.inputType,
@@ -150,6 +151,7 @@ export var Chat = /*#__PURE__*/React.forwardRef(function (props, ref) {
     onBlur: onInputBlur,
     onSend: onSend,
     onImageSend: onImageSend,
+    onFileSelected: onFileSelected,
     rightAction: rightAction
   }))));
 });

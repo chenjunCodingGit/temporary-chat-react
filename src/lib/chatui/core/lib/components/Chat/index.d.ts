@@ -57,7 +57,7 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
     /**
      * 快捷短语渲染函数
      */
-    renderQuickReplies?: () => void;
+    renderQuickReplies?: () => React.ReactNode;
     /**
      * 输入区 ref
      */
@@ -85,6 +85,9 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
      */
     /**
      * 发送图片回调
+     */
+    /**
+     * 发送文件回调
      */
     /**
      * 输入方式
@@ -162,7 +165,7 @@ export declare const Chat: React.ForwardRefExoticComponent<Omit<ComposerProps, "
     /**
      * 快捷短语渲染函数
      */
-    renderQuickReplies?: () => void;
+    renderQuickReplies?: () => React.ReactNode;
     /**
      * 输入区 ref
      */
@@ -190,6 +193,9 @@ export declare const Chat: React.ForwardRefExoticComponent<Omit<ComposerProps, "
      */
     /**
      * 发送图片回调
+     */
+    /**
+     * 发送文件回调
      */
     /**
      * 输入方式

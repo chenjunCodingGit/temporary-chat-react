@@ -4,6 +4,11 @@ interface ComposerInputProps extends InputProps {
     invisible: boolean;
     inputRef: React.MutableRefObject<HTMLTextAreaElement>;
     onImageSend?: (file: File) => Promise<any>;
+    onFileSelected?: (file: File, fileInfo: {
+        name: string;
+        extension: string;
+        size: number;
+    }) => void;
 }
-export declare const ComposerInput: ({ inputRef, invisible, onImageSend, ...rest }: ComposerInputProps) => React.JSX.Element;
+export declare const ComposerInput: ({ inputRef, invisible, onImageSend, onFileSelected, ...rest }: ComposerInputProps) => React.JSX.Element;
 export {};

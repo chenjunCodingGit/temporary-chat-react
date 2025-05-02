@@ -51,6 +51,7 @@ var Chat = exports.Chat = /*#__PURE__*/_react.default.forwardRef(function (props
     onInputBlur = props.onInputBlur,
     onSend = props.onSend,
     onImageSend = props.onImageSend,
+    onFileSelected = props.onFileSelected,
     inputOptions = props.inputOptions,
     composerRef = props.composerRef,
     inputType = props.inputType,
@@ -160,6 +161,7 @@ var Chat = exports.Chat = /*#__PURE__*/_react.default.forwardRef(function (props
     onBlur: onInputBlur,
     onSend: onSend,
     onImageSend: onImageSend,
+    onFileSelected: onFileSelected,
     rightAction: rightAction
   }))));
 });

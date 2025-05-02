@@ -44,7 +44,7 @@ var Button = exports.Button = /*#__PURE__*/_react.default.forwardRef(function (p
     onClick: handleClick,
     ref: ref
   }, other), icon && /*#__PURE__*/_react.default.createElement("span", {
-    className: "Btn-icon"
+    className: ["Btn-icon", className].join(' ')
   }, /*#__PURE__*/_react.default.createElement(_Icon.Icon, {
     type: icon,
     spin: loading

@@ -37,7 +37,7 @@ export var Button = /*#__PURE__*/React.forwardRef(function (props, ref) {
     onClick: handleClick,
     ref: ref
   }, other), icon && /*#__PURE__*/React.createElement("span", {
-    className: "Btn-icon"
+    className: ["Btn-icon", className].join(' ')
   }, /*#__PURE__*/React.createElement(Icon, {
     type: icon,
     spin: loading

@@ -34,6 +34,7 @@ export var Composer = /*#__PURE__*/React.forwardRef(function (props, ref) {
     onChange = props.onChange,
     onSend = props.onSend,
     onImageSend = props.onImageSend,
+    onFileSelected = props.onFileSelected,
     onAccessoryToggle = props.onAccessoryToggle,
     _props$toolbar = props.toolbar,
     toolbar = _props$toolbar === void 0 ? [] : _props$toolbar,
@@ -251,7 +252,8 @@ export var Composer = /*#__PURE__*/React.forwardRef(function (props, ref) {
     onBlur: handleInputBlur,
     onKeyDown: handleInputKeyDown,
     onChange: handleTextChange,
-    onImageSend: onImageSend
+    onImageSend: onImageSend,
+    onFileSelected: onFileSelected
   });
   if (isWide) {
     return /*#__PURE__*/React.createElement("div", {
