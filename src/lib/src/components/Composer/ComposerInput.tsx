@@ -51,7 +51,7 @@ export const ComposerInput = ({
     }
   }, [inputRef]);
 
-  const onUploadClick = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const onUploadClick = () => {
     if (fileInputRef.current) {
       fileInputRef.current.click();
     }
@@ -96,7 +96,7 @@ export const ComposerInput = ({
       <div
         className="Composer-input-upload"
       >
-        <Button className={clsx("Toolbar-btn", "Toolbar-btnIcon-Button")} onClick={(e) => onUploadClick(e)}>
+        <Button className={clsx("Toolbar-btn", "Toolbar-btnIcon-Button")} onClick={() => onUploadClick()}>
           <span className={clsx(["Toolbar-btnIcon", "Toolbar-btnIcon-upload"])} >
             <Icon type={'file'} className={clsx('Toolbar-Icon-loading')} />
           </span>
