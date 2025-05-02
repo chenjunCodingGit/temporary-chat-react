@@ -64,7 +64,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, r
       {...other}
     >
       {icon && (
-        <span className="Btn-icon">
+        <span className={["Btn-icon", className].join(' ')}>
           <Icon type={icon} spin={loading} />
         </span>
       )}

@@ -72,7 +72,7 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
     /**
      * 快捷短语渲染函数
      */
-    renderQuickReplies?: () => void;
+    renderQuickReplies?: () => React.ReactNode;
     /**
      * 输入区 ref
      */
