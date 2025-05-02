@@ -2,7 +2,7 @@ import React, { ReactNode } from 'react';
 import { DemoPage } from './DemoPage';
 import { DemoSection } from './DemoSection';
 // @ts-ignore
-import { Bubble } from '../lib/chatui/index';
+import { Bubble } from '../lib/src/index';
 
 interface BubbleProps {
   type?: 'text' | 'image';
