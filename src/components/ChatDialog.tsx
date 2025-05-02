@@ -51,6 +51,10 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
   const { messages, appendMsg } = useMessages(initialMessages);
   const [chatDialogClass, setChatDialogClass] = useState('');
   const [preChatSurveyFlag, setPreChatSurveyFlag] = useState(true);
+  const [value1, setValue1] = useState('');
+  const [value2, setValue2] = useState('');
+  const [value3, setValue3] = useState('');
+  const [value4, setValue4] = useState('');
 
   useEffect(() => {
     if (isOpen) {
@@ -194,13 +198,14 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
                 className="preChatCard"
                 fluid
               >
-                <CardMedia
-                  aspectRatio="wide"
-                  image="//gw.alicdn.com/tfs/TB1pLWVTAT2gK0jSZFkXXcIQFXa-620-320.jpg"
-                />
-                <CardTitle title="我是标题" />
+                <CardTitle>The Title 1</CardTitle>
+                <Input value={value1} onChange={val => setValue1(val)} placeholder="Please input..." />
+                <CardTitle>The Title 2</CardTitle>
+                <Input value={value2} onChange={val => setValue2(val)} placeholder="Please input..." />
+                <CardTitle>The Title 3</CardTitle>
+                <Input value={value3} onChange={val => setValue3(val)} placeholder="Please input..." />
                 <CardText>
-                  内容详情内容详情内容详情
+                  Description...
                 </CardText>
                 <CardActions>
                   <Button
