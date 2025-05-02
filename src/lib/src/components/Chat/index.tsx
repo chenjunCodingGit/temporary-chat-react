@@ -106,6 +106,10 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
      */
     // onImageSend?: (file: File) => Promise<any>;
     /**
+     * 发送文件回调
+     */
+    // onFileSelected?: (file: File) => Promise<any>;
+    /**
      * 输入方式
      */
     // inputType?: InputType;
@@ -167,6 +171,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     onInputBlur,
     onSend,
     onImageSend,
+    onFileSelected,
     inputOptions,
     composerRef,
     inputType,
@@ -282,6 +287,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             onBlur={onInputBlur}
             onSend={onSend}
             onImageSend={onImageSend}
+            onFileSelected={onFileSelected}
             rightAction={rightAction}
           />
         </div>

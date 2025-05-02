@@ -1,7 +1,7 @@
 // src/components/ChatDialog.tsx
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
-import Chat, { Icon, IconButton, Bubble, useMessages } from '../lib/src/index';
+import Chat, { Icon, IconButton, Bubble, useMessages, FileCard } from '../lib/src/index';
 // import Chat, { Icon, IconButton, Bubble, useMessages } from '../lib/chatui/core/es/index';
 import chatbotAvatarSVG from '../assets/chatbot-avatar.svg';
 import styles from '../styles/ChatDialog.module.css';
@@ -87,6 +87,32 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
     }
   }
 
+  const handleFileSelected = (file: File, fileInfo: { name: string; extension: string; size: number; }) => {
+    console.log('file', file);
+    console.log('fileInfo', fileInfo);
+
+    // 这里可以根据文件类型和大小进行判断
+    // 例如：只允许上传图片文件
+    const allowedTypes = ['.jpg', '.jpeg', '.png', '.gif', '.bmp', '.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.pdf'];
+    const maxSize = 5 * 1024 * 1024; // 5MB
+    const fileExtension = '.' + (file.name.split('.').pop() || '').toLowerCase();
+    if (allowedTypes.includes(fileExtension) && file.size <= maxSize) {
+      // 发送图片消息
+      appendMsg({
+        type: 'file',
+        content: {
+          file: {
+            name: fileInfo.name,
+            extension: fileExtension,
+            size: fileInfo.size,
+            url: URL.createObjectURL(file), // 这里可以使用 URL.createObjectURL(file) 来预览图片
+          },
+        },
+        position: 'right',
+      });
+    }
+  }
+
   // 快捷短语回调，可根据 item 数据做出不同的操作，这里以发送文本消息为例
   function handleQuickReplyClick(item: { name: any; }) {
     handleSend('text', item.name);
@@ -126,6 +152,13 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
             <img src={content.picUrl} alt="" />
           </Bubble>
         ) : null;
+      case 'file':
+        return content?.file ? (
+          <FileCard
+            file={content?.file}
+            extension={content?.file.extension}
+          />
+        ) : null;
       default:
         return null;
     }
@@ -161,6 +194,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
           quickReplies={defaultQuickReplies}
           onQuickReplyClick={handleQuickReplyClick}
           onSend={handleSend}
+          onFileSelected={handleFileSelected}
         />
       </div>
     </div>

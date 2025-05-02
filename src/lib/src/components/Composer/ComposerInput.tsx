@@ -7,7 +7,7 @@ import parseDataTransfer from '../../utils/parseDataTransfer';
 import canUse from '../../utils/canUse';
 import { Button } from '../Button';
 import { Icon } from '../Icon';
-import {toast} from '../Toast';
+import { toast } from '../Toast';
 
 const canTouch = canUse('touch');
 
@@ -15,12 +15,14 @@ interface ComposerInputProps extends InputProps {
   invisible: boolean;
   inputRef: React.MutableRefObject<HTMLTextAreaElement>;
   onImageSend?: (file: File) => Promise<any>;
+  onFileSelected?: (file: File, fileInfo: { name: string; extension: string; size: number },) => void;
 }
 
 export const ComposerInput = ({
   inputRef,
   invisible,
   onImageSend,
+  onFileSelected,
   ...rest
 }: ComposerInputProps) => {
   const fileInputRef = React.createRef<HTMLInputElement>();
@@ -71,24 +73,8 @@ export const ComposerInput = ({
 
         const formData = new FormData();
         formData.append('file', file);
-
-        try {
-          const response = await fetch('/upload', {
-            method: 'POST',
-            body: formData
-          });
-
-          if (response.ok) {
-            const result = await response.json();
-            console.log('File uploaded successfully:', result);
-            toast.success('File uploaded successfully.');
-          } else {
-            console.error('File upload failed:', response.statusText);
-            toast.fail('File upload failed.')
-          }
-        } catch (error) {
-          console.error('Network error:', error);
-          toast.fail('Network error, please try again after refresh page.')
+        if (onFileSelected) {
+          onFileSelected(file, fileInfo);
         }
       } else {
         if (!allowedTypes.includes(fileExtension)) {
