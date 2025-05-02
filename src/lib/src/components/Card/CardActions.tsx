@@ -4,6 +4,7 @@ import clsx from 'clsx';
 export type CardActionsProps = {
   className?: string;
   direction?: 'column' | 'row';
+  children?: React.ReactNode;
 };
 
 export const CardActions: React.FC<CardActionsProps> = (props) => {

@@ -1,8 +1,8 @@
 // src/components/ChatDialog.tsx
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
-import Chat, { Icon, IconButton, Bubble, useMessages, FileCard } from '../lib/chatui/core/es/index';
-// import Chat, { Icon, IconButton, Bubble, useMessages, FileCard } from '../lib/src/index';
+// import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input } from '../lib/chatui/core/es/index';
+import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input } from '../lib/src/index';
 import chatbotAvatarSVG from '../assets/chatbot-avatar.svg';
 import styles from '../styles/ChatDialog.module.css';
 import { RateActions } from './RateActions'
@@ -50,6 +50,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
 
   const { messages, appendMsg } = useMessages(initialMessages);
   const [chatDialogClass, setChatDialogClass] = useState('');
+  const [preChatSurveyFlag, setPreChatSurveyFlag] = useState(true);
 
   useEffect(() => {
     if (isOpen) {
@@ -157,7 +158,9 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
           <FileCard
             file={content?.file}
             extension={content?.file.extension}
-          />
+          >
+            <a href="#">Download</a>
+          </FileCard>
         ) : null;
       default:
         return null;
@@ -175,27 +178,65 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
         <button className={styles.closeBtn} onClick={onClose}>
           X
         </button>
-        <Chat
-          locale="en-US"
-          navbar={{
-            title: 'ChatBot AI',
-            className: styles.navbarStyle,
-            rightContent: [
-              {
-                icon: 'close',
-                onClick: handleCloseDialog,
-              },
-            ],
-            // rightSlot: <Icon type="close" onClick={handleCloseDialog} />
-          }}
-          messages={messages}
-          placeholder='please enter your message'
-          renderMessageContent={renderMessageContent}
-          quickReplies={defaultQuickReplies}
-          onQuickReplyClick={handleQuickReplyClick}
-          onSend={handleSend}
-          onFileSelected={handleFileSelected}
-        />
+        {
+          preChatSurveyFlag ? (
+            <div>
+              <Navbar
+                title="ChatBot AI"
+                rightContent={[
+                  {
+                    icon: 'close',
+                    onClick: handleCloseDialog,
+                  },
+                ]}
+              />
+              <Card
+                className="preChatCard"
+                fluid
+              >
+                <CardMedia
+                  aspectRatio="wide"
+                  image="//gw.alicdn.com/tfs/TB1pLWVTAT2gK0jSZFkXXcIQFXa-620-320.jpg"
+                />
+                <CardTitle title="我是标题" />
+                <CardText>
+                  内容详情内容详情内容详情
+                </CardText>
+                <CardActions>
+                  <Button
+                    onClick={() => setPreChatSurveyFlag(false)}
+                  >Cancel</Button>
+                  <Button
+                    onClick={() => setPreChatSurveyFlag(false)}
+                    color="primary"
+                  >Submit</Button>
+                </CardActions>
+              </Card>
+            </div>
+          ) : (
+            <Chat
+              locale="en-US"
+              navbar={{
+                title: 'ChatBot AI',
+                className: styles.navbarStyle,
+                rightContent: [
+                  {
+                    icon: 'close',
+                    onClick: handleCloseDialog,
+                  },
+                ],
+                // rightSlot: <Icon type="close" onClick={handleCloseDialog} />
+              }}
+              messages={messages}
+              placeholder='please enter your message'
+              renderMessageContent={renderMessageContent}
+              quickReplies={defaultQuickReplies}
+              onQuickReplyClick={handleQuickReplyClick}
+              onSend={handleSend}
+              onFileSelected={handleFileSelected}
+            />
+          )
+        }
       </div>
     </div>
   );
