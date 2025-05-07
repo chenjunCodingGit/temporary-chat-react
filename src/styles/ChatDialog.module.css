@@ -34,6 +34,14 @@
 	cursor: pointer;
 }
 
+.loadingContainer {
+	width: calc(100% - 48px);
+	padding: 12px;
+	background: #fff;
+	margin: 0 auto;
+	border-radius: 6px;
+}
+
 .chatContent {
 	overflow-y: auto;
 	height: calc(100% - 60px);

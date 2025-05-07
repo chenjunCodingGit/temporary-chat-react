@@ -1,8 +1,8 @@
 // src/components/ChatDialog.tsx
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
-// import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input } from '../lib/chatui/core/es/index';
-import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input } from '../lib/src/index';
+// import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton } from '../lib/chatui/core/es/index';
+import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton } from '../lib/src/index';
 import chatbotAvatarSVG from '../assets/chatbot-avatar.svg';
 import styles from '../styles/ChatDialog.module.css';
 import { RateActions } from './RateActions'
@@ -46,17 +46,24 @@ interface ChatDialogProps {
   onClose: () => void;
 }
 
-const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
+const ChatDialog: React.FC<ChatDialogProps> = ({
+  isOpen,
+  onClose
+}) => {
 
   const { messages, appendMsg } = useMessages(initialMessages);
   const [chatDialogClass, setChatDialogClass] = useState('');
+  const [initChatLoading, setInitChatLoading] = useState(true);
   const [preChatSurveyFlag, setPreChatSurveyFlag] = useState(true);
   const [value1, setValue1] = useState('');
   const [value2, setValue2] = useState('');
   const [value3, setValue3] = useState('');
-  const [value4, setValue4] = useState('');
 
   useEffect(() => {
+    setTimeout(() => {
+      setInitChatLoading(false);
+    }, 20000);
+
     if (isOpen) {
       setChatDialogClass(styles.open);
     } else {
@@ -183,7 +190,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
           X
         </button>
         {
-          preChatSurveyFlag ? (
+          initChatLoading ? (
             <div>
               <Navbar
                 title="ChatBot AI"
@@ -194,53 +201,86 @@ const ChatDialog: React.FC<ChatDialogProps> = ({ isOpen, onClose }) => {
                   },
                 ]}
               />
-              <Card
-                className="preChatCard"
-                fluid
-              >
-                <CardTitle>The Title 1</CardTitle>
-                <Input value={value1} onChange={val => setValue1(val)} placeholder="Please input..." />
-                <CardTitle>The Title 2</CardTitle>
-                <Input value={value2} onChange={val => setValue2(val)} placeholder="Please input..." />
-                <CardTitle>The Title 3</CardTitle>
-                <Input value={value3} onChange={val => setValue3(val)} placeholder="Please input..." />
-                <CardText>
-                  Description...
-                </CardText>
-                <CardActions>
-                  <Button
-                    onClick={() => setPreChatSurveyFlag(false)}
-                  >Cancel</Button>
-                  <Button
-                    onClick={() => setPreChatSurveyFlag(false)}
-                    color="primary"
-                  >Submit</Button>
-                </CardActions>
-              </Card>
+              <div className={styles.loadingContainer}>
+                <Skeleton h={140} w="85%" r="sm" />
+              </div>
+              <div style={{ height: '10px', width: '100%' }}></div>
+              <div className={styles.loadingContainer}>
+                <Skeleton h={40} w="85%" r="sm" />
+              </div>
             </div>
-          ) : (
-            <Chat
-              locale="en-US"
-              navbar={{
-                title: 'ChatBot AI',
-                className: styles.navbarStyle,
-                rightContent: [
-                  {
-                    icon: 'close',
-                    onClick: handleCloseDialog,
-                  },
-                ],
-                // rightSlot: <Icon type="close" onClick={handleCloseDialog} />
-              }}
-              messages={messages}
-              placeholder='please enter your message'
-              renderMessageContent={renderMessageContent}
-              quickReplies={defaultQuickReplies}
-              onQuickReplyClick={handleQuickReplyClick}
-              onSend={handleSend}
-              onFileSelected={handleFileSelected}
-            />
-          )
+          ) :
+
+            (
+              preChatSurveyFlag ? (
+                <div>
+                  <Navbar
+                    title="ChatBot AI"
+                    rightContent={[
+                      {
+                        icon: 'close',
+                        onClick: handleCloseDialog,
+                      },
+                    ]}
+                  />
+                  <div className={styles.loadingContainer}>
+                    <Card
+                      className="preChatCard"
+                      fluid
+                    >
+                      <div style={{ marginLeft: '12px', marginTop: '0px' }}>
+                        <CardText textPosition="left">
+                          Please answer below questions.
+                        </CardText>
+                      </div>
+                      <CardTitle className="CardTitle-Text-Left">Email</CardTitle>
+                      <div style={{ width: '85%', marginLeft: '12px' }}>
+                        <Input value={value1} onChange={val => setValue1(val)} placeholder="Please input..." />
+                      </div>
+                      <CardTitle className="CardTitle-Text-Left">First Name</CardTitle>
+                      <div style={{ width: '85%', marginLeft: '12px' }}>
+                        <Input value={value2} onChange={val => setValue2(val)} placeholder="Please input..." />
+                      </div>
+                      <CardTitle className="CardTitle-Text-Left">Last Name</CardTitle>
+                      <div style={{ width: '85%', marginLeft: '12px' }}>
+                        <Input value={value3} onChange={val => setValue3(val)} placeholder="Please input..." />
+                      </div>
+                      <CardActions>
+                        <Button
+                          onClick={() => setPreChatSurveyFlag(false)}
+                        >Cancel</Button>
+                        <Button
+                          onClick={() => setPreChatSurveyFlag(false)}
+                          color="primary"
+                        >Submit</Button>
+                      </CardActions>
+                    </Card>
+                  </div>
+                </div>
+              ) : (
+                <Chat
+                  locale="en-US"
+                  navbar={{
+                    title: 'ChatBot AI',
+                    className: styles.navbarStyle,
+                    rightContent: [
+                      {
+                        icon: 'close',
+                        onClick: handleCloseDialog,
+                      },
+                    ],
+                    // rightSlot: <Icon type="close" onClick={handleCloseDialog} />
+                  }}
+                  messages={messages}
+                  placeholder='please enter your message'
+                  renderMessageContent={renderMessageContent}
+                  quickReplies={defaultQuickReplies}
+                  onQuickReplyClick={handleQuickReplyClick}
+                  onSend={handleSend}
+                  onFileSelected={handleFileSelected}
+                />
+              )
+            )
         }
       </div>
     </div>

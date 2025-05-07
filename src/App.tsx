@@ -7,7 +7,7 @@ import viteLogo from '/vite.svg'
 const { VITE_APP_TITLE } = import.meta.env;
 
 export default function () {
-  const [isChatOpen, setIsChatOpen] = useState(true);
+  const [isChatOpen, setIsChatOpen] = useState(false);
 
   const toggleChat = () => {
     setIsChatOpen(!isChatOpen);
