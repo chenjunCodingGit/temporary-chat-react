@@ -62,7 +62,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
   useEffect(() => {
     setTimeout(() => {
       setInitChatLoading(false);
-    }, 20000);
+    }, 2000);
 
     if (isOpen) {
       setChatDialogClass(styles.open);

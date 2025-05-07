@@ -2,9 +2,8 @@
 .chatDialogWrapper {
 	position: fixed;
 	bottom: 24px;
-	right: -300px;
 	/* 初始位置在屏幕外 */
-	width: 380px;
+	width: 500px;
 	box-shadow: 0 11px 18px 0 hsla(0, 0%, 75%, .7);
 	height: calc(100vh - 40px - 24px);
 

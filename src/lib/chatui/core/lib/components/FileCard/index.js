@@ -33,7 +33,12 @@ var FileCard = exports.FileCard = function FileCard(props) {
     truncate: true,
     as: "span",
     className: "FileCard-ext"
-  }, ext)), /*#__PURE__*/_react.default.createElement(_Flex.FlexItem, null, /*#__PURE__*/_react.default.createElement(_Text.Text, {
+  }, ext)), /*#__PURE__*/_react.default.createElement(_Flex.FlexItem, null, name.toString().length > 60 ? /*#__PURE__*/_react.default.createElement(_Text.Text, {
+    truncate: 2,
+    title: name,
+    breakWord: true,
+    className: "FileCard-name"
+  }, name) : /*#__PURE__*/_react.default.createElement(_Text.Text, {
     truncate: 2,
     breakWord: true,
     className: "FileCard-name"
