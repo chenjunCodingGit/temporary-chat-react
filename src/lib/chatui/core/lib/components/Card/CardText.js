@@ -9,12 +9,13 @@ var _extends2 = _interopRequireDefault(require("@babel/runtime/helpers/extends")
 var _objectWithoutProperties2 = _interopRequireDefault(require("@babel/runtime/helpers/objectWithoutProperties"));
 var _react = _interopRequireDefault(require("react"));
 var _clsx = _interopRequireDefault(require("clsx"));
-var _excluded = ["className", "children"];
+var _excluded = ["className", "textPosition", "children"];
 var CardText = exports.CardText = function CardText(props) {
   var className = props.className,
+    textPosition = props.textPosition,
     children = props.children,
     other = (0, _objectWithoutProperties2.default)(props, _excluded);
   return /*#__PURE__*/_react.default.createElement("div", (0, _extends2.default)({
-    className: (0, _clsx.default)('CardText', className)
+    className: (0, _clsx.default)('CardText', "CardText--".concat(textPosition), className)
   }, other), typeof children === 'string' ? /*#__PURE__*/_react.default.createElement("p", null, children) : children);
 };

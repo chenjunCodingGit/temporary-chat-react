@@ -37,6 +37,7 @@
 
 .preChatCard {
   width: 100%;
+  margin: 0 auto;
 }
 
 /* CardMedia */
@@ -178,6 +179,10 @@
   }
 }
 
+.CardTitle-Text-Left {
+  text-align: left;
+}
+
 /* CardContent */
 .CardContent {
   padding: @card-padding;
@@ -185,12 +190,21 @@
 
 /* CardText */
 .CardText {
-  padding: @card-padding;
   color: @card-text-color;
 
   p {
     margin: 0;
   }
+}
+
+.CardText--left {
+  text-align: left;
+}
+.CardText--center {
+  text-align: center;
+}
+.CardText--right {
+  text-align: right;
 }
 
 /* CardActions */
