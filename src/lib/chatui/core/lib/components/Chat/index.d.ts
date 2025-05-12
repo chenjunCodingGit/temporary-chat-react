@@ -108,6 +108,10 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
      * 点击附加内容回调
      */
     /**
+     * Files allowed to be uploaded
+     */
+    allowedFileTypes?: string[];
+    /**
      * 输入组件
      */
     Composer?: React.ElementType;
@@ -215,6 +219,10 @@ export declare const Chat: React.ForwardRefExoticComponent<Omit<ComposerProps, "
     /**
      * 点击附加内容回调
      */
+    /**
+     * Files allowed to be uploaded
+     */
+    allowedFileTypes?: string[];
     /**
      * 输入组件
      */

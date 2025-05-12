@@ -51,6 +51,7 @@ export var Chat = /*#__PURE__*/React.forwardRef(function (props, ref) {
     onToolbarClick = props.onToolbarClick,
     onAccessoryToggle = props.onAccessoryToggle,
     rightAction = props.rightAction,
+    allowedFileTypes = props.allowedFileTypes,
     _props$Composer = props.Composer,
     Composer = _props$Composer === void 0 ? DComposer : _props$Composer,
     isX = props.isX;
@@ -141,6 +142,7 @@ export var Chat = /*#__PURE__*/React.forwardRef(function (props, ref) {
     textOnce: textOnce,
     inputOptions: inputOptions,
     placeholder: placeholder,
+    allowedFileTypes: allowedFileTypes,
     onAccessoryToggle: onAccessoryToggle,
     recorder: recorder,
     toolbar: toolbar,

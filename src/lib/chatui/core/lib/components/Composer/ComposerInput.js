@@ -21,13 +21,14 @@ var _canUse = _interopRequireDefault(require("../../utils/canUse"));
 var _Button = require("../Button");
 var _Icon = require("../Icon");
 var _Toast = require("../Toast");
-var _excluded = ["inputRef", "invisible", "onImageSend", "onFileSelected"];
+var _excluded = ["inputRef", "invisible", "allowedFileTypes", "onImageSend", "onFileSelected"];
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != _typeof(e) && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 var canTouch = (0, _canUse.default)('touch');
 var ComposerInput = exports.ComposerInput = function ComposerInput(_ref) {
   var inputRef = _ref.inputRef,
     invisible = _ref.invisible,
+    allowedFileTypes = _ref.allowedFileTypes,
     onImageSend = _ref.onImageSend,
     onFileSelected = _ref.onFileSelected,
     rest = (0, _objectWithoutProperties2.default)(_ref, _excluded);
@@ -63,16 +64,16 @@ var ComposerInput = exports.ComposerInput = function ComposerInput(_ref) {
   var handleFileChange = /*#__PURE__*/function () {
     var _ref2 = (0, _asyncToGenerator2.default)(/*#__PURE__*/_regenerator.default.mark(function _callee(e) {
       var _e$target$files;
-      var file, allowedTypes, maxSize, fileExtension, fileInfo, formData;
+      var file, allowedTypes, fileExtension, fileInfo, formData;
       return _regenerator.default.wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
             file = (_e$target$files = e.target.files) === null || _e$target$files === void 0 ? void 0 : _e$target$files[0];
             if (file) {
-              allowedTypes = ['.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.pdf'];
-              maxSize = 5 * 1024 * 1024; // 5MB
+              allowedTypes = allowedFileTypes || ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.pdf']; // const maxSize = 5 * 1024 * 1024; // 5MB
+              // && file.size <= maxSize
               fileExtension = '.' + (file.name.split('.').pop() || '').toLowerCase();
-              if (allowedTypes.includes(fileExtension) && file.size <= maxSize) {
+              if (allowedTypes.includes(fileExtension)) {
                 fileInfo = {
                   name: file.name,
                   extension: fileExtension,
@@ -89,10 +90,10 @@ var ComposerInput = exports.ComposerInput = function ComposerInput(_ref) {
                   console.error('Not allowed file types, please select Word, Excel, PPT, or PDF files.');
                   _Toast.toast.fail('Not allowed file types, please select Word, Excel, PPT, or PDF files.');
                 }
-                if (file.size > maxSize) {
-                  console.error("The file size exceeds 5MB, please choose a smaller file.");
-                  _Toast.toast.show('The file size exceeds 5MB, please choose a smaller file.');
-                }
+                // if (file.size > maxSize) {
+                //   console.error(`The file size exceeds 5MB, please choose a smaller file.`);
+                //   toast.show('The file size exceeds 5MB, please choose a smaller file.')
+                // }
                 // 清空选择的文件
                 e.target.value = '';
               }

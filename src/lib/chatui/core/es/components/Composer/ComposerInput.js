@@ -2,7 +2,7 @@ import _extends from "@babel/runtime/helpers/esm/extends";
 import _asyncToGenerator from "@babel/runtime/helpers/esm/asyncToGenerator";
 import _slicedToArray from "@babel/runtime/helpers/esm/slicedToArray";
 import _objectWithoutProperties from "@babel/runtime/helpers/esm/objectWithoutProperties";
-var _excluded = ["inputRef", "invisible", "onImageSend", "onFileSelected"];
+var _excluded = ["inputRef", "invisible", "allowedFileTypes", "onImageSend", "onFileSelected"];
 import _regeneratorRuntime from "@babel/runtime/regenerator";
 import React, { useState, useEffect, useCallback } from 'react';
 import clsx from 'clsx';
@@ -18,6 +18,7 @@ var canTouch = canUse('touch');
 export var ComposerInput = function ComposerInput(_ref) {
   var inputRef = _ref.inputRef,
     invisible = _ref.invisible,
+    allowedFileTypes = _ref.allowedFileTypes,
     onImageSend = _ref.onImageSend,
     onFileSelected = _ref.onFileSelected,
     rest = _objectWithoutProperties(_ref, _excluded);
@@ -53,16 +54,16 @@ export var ComposerInput = function ComposerInput(_ref) {
   var handleFileChange = /*#__PURE__*/function () {
     var _ref2 = _asyncToGenerator(/*#__PURE__*/_regeneratorRuntime.mark(function _callee(e) {
       var _e$target$files;
-      var file, allowedTypes, maxSize, fileExtension, fileInfo, formData;
+      var file, allowedTypes, fileExtension, fileInfo, formData;
       return _regeneratorRuntime.wrap(function _callee$(_context) {
         while (1) switch (_context.prev = _context.next) {
           case 0:
             file = (_e$target$files = e.target.files) === null || _e$target$files === void 0 ? void 0 : _e$target$files[0];
             if (file) {
-              allowedTypes = ['.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.pdf'];
-              maxSize = 5 * 1024 * 1024; // 5MB
+              allowedTypes = allowedFileTypes || ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.pdf']; // const maxSize = 5 * 1024 * 1024; // 5MB
+              // && file.size <= maxSize
               fileExtension = '.' + (file.name.split('.').pop() || '').toLowerCase();
-              if (allowedTypes.includes(fileExtension) && file.size <= maxSize) {
+              if (allowedTypes.includes(fileExtension)) {
                 fileInfo = {
                   name: file.name,
                   extension: fileExtension,
@@ -79,10 +80,10 @@ export var ComposerInput = function ComposerInput(_ref) {
                   console.error('Not allowed file types, please select Word, Excel, PPT, or PDF files.');
                   toast.fail('Not allowed file types, please select Word, Excel, PPT, or PDF files.');
                 }
-                if (file.size > maxSize) {
-                  console.error("The file size exceeds 5MB, please choose a smaller file.");
-                  toast.show('The file size exceeds 5MB, please choose a smaller file.');
-                }
+                // if (file.size > maxSize) {
+                //   console.error(`The file size exceeds 5MB, please choose a smaller file.`);
+                //   toast.show('The file size exceeds 5MB, please choose a smaller file.')
+                // }
                 // 清空选择的文件
                 e.target.value = '';
               }

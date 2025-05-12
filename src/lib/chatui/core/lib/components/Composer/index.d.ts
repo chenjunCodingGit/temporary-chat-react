@@ -12,6 +12,7 @@ export type ComposerProps = {
     inputOptions?: InputProps;
     placeholder?: string;
     inputType?: InputType;
+    allowedFileTypes?: string[];
     onInputTypeChange?: (inputType: InputType) => void;
     recorder?: RecorderProps;
     onSend: (type: string, content: string) => void;

@@ -28,6 +28,8 @@ export var Composer = /*#__PURE__*/React.forwardRef(function (props, ref) {
     oPlaceholder = _props$placeholder === void 0 ? '请输入...' : _props$placeholder,
     _props$recorder = props.recorder,
     recorder = _props$recorder === void 0 ? {} : _props$recorder,
+    _props$allowedFileTyp = props.allowedFileTypes,
+    allowedFileTypes = _props$allowedFileTyp === void 0 ? ['.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.pdf'] : _props$allowedFileTyp,
     onInputTypeChange = props.onInputTypeChange,
     onFocus = props.onFocus,
     onBlur = props.onBlur,
@@ -245,6 +247,7 @@ export var Composer = /*#__PURE__*/React.forwardRef(function (props, ref) {
   var inputTypeIcon = isInputText ? 'mic' : 'keyboard';
   var hasToolbar = toolbar.length > 0;
   var inputProps = _objectSpread(_objectSpread({}, inputOptions), {}, {
+    allowedFileTypes: allowedFileTypes,
     value: text,
     inputRef: inputRef,
     placeholder: placeholder,

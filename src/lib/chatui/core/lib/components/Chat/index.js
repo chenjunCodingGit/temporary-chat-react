@@ -61,6 +61,7 @@ var Chat = exports.Chat = /*#__PURE__*/_react.default.forwardRef(function (props
     onToolbarClick = props.onToolbarClick,
     onAccessoryToggle = props.onAccessoryToggle,
     rightAction = props.rightAction,
+    allowedFileTypes = props.allowedFileTypes,
     _props$Composer = props.Composer,
     Composer = _props$Composer === void 0 ? _Composer.Composer : _props$Composer,
     isX = props.isX;
@@ -151,6 +152,7 @@ var Chat = exports.Chat = /*#__PURE__*/_react.default.forwardRef(function (props
     textOnce: textOnce,
     inputOptions: inputOptions,
     placeholder: placeholder,
+    allowedFileTypes: allowedFileTypes,
     onAccessoryToggle: onAccessoryToggle,
     recorder: recorder,
     toolbar: toolbar,
