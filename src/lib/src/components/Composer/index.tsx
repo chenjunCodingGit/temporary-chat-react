@@ -25,6 +25,7 @@ export type ComposerProps = {
   inputOptions?: InputProps;
   placeholder?: string;
   inputType?: InputType;
+  allowedFileTypes?: string[];
   onInputTypeChange?: (inputType: InputType) => void;
   recorder?: RecorderProps;
   onSend: (type: string, content: string) => void;
@@ -52,6 +53,7 @@ export const Composer = React.forwardRef<ComposerHandle, ComposerProps>((props, 
     wideBreakpoint,
     placeholder: oPlaceholder = '请输入...',
     recorder = {},
+    allowedFileTypes = ['.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.pdf'],
     onInputTypeChange,
     onFocus,
     onBlur,
@@ -297,6 +299,7 @@ export const Composer = React.forwardRef<ComposerHandle, ComposerProps>((props, 
 
   const inputProps = {
     ...inputOptions,
+    allowedFileTypes,
     value: text,
     inputRef,
     placeholder,

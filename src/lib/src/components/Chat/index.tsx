@@ -134,6 +134,10 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
      */
     // onAccessoryToggle?: () => void;
     /**
+     * Files allowed to be uploaded
+     */
+    allowedFileTypes?: string[];
+    /**
      * 输入组件
      */
     Composer?: React.ElementType; // FIXME
@@ -181,6 +185,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     onToolbarClick,
     onAccessoryToggle,
     rightAction,
+    allowedFileTypes,
     Composer = DComposer,
     isX,
   } = props;
@@ -277,6 +282,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             textOnce={textOnce}
             inputOptions={inputOptions}
             placeholder={placeholder}
+            allowedFileTypes={allowedFileTypes}
             onAccessoryToggle={onAccessoryToggle}
             recorder={recorder}
             toolbar={toolbar}

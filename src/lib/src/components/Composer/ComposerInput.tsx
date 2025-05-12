@@ -13,6 +13,7 @@ const canTouch = canUse('touch');
 
 interface ComposerInputProps extends InputProps {
   invisible: boolean;
+  allowedFileTypes?: string[];
   inputRef: React.MutableRefObject<HTMLTextAreaElement>;
   onImageSend?: (file: File) => Promise<any>;
   onFileSelected?: (file: File, fileInfo: { name: string; extension: string; size: number },) => void;
@@ -21,6 +22,7 @@ interface ComposerInputProps extends InputProps {
 export const ComposerInput = ({
   inputRef,
   invisible,
+  allowedFileTypes,
   onImageSend,
   onFileSelected,
   ...rest
@@ -60,10 +62,11 @@ export const ComposerInput = ({
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
-      const allowedTypes = ['.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.pdf'];
-      const maxSize = 5 * 1024 * 1024; // 5MB
+      const allowedTypes = allowedFileTypes || ['.doc', '.docx', '.xls', '.xlsx', '.ppt', '.pptx', '.pdf'];
+      // const maxSize = 5 * 1024 * 1024; // 5MB
+      // && file.size <= maxSize
       const fileExtension = '.' + (file.name.split('.').pop() || '').toLowerCase();
-      if (allowedTypes.includes(fileExtension) && file.size <= maxSize) {
+      if (allowedTypes.includes(fileExtension)) {
         const fileInfo = {
           name: file.name,
           extension: fileExtension,
@@ -81,10 +84,10 @@ export const ComposerInput = ({
           console.error('Not allowed file types, please select Word, Excel, PPT, or PDF files.');
           toast.fail('Not allowed file types, please select Word, Excel, PPT, or PDF files.');
         }
-        if (file.size > maxSize) {
-          console.error(`The file size exceeds 5MB, please choose a smaller file.`);
-          toast.show('The file size exceeds 5MB, please choose a smaller file.')
-        }
+        // if (file.size > maxSize) {
+        //   console.error(`The file size exceeds 5MB, please choose a smaller file.`);
+        //   toast.show('The file size exceeds 5MB, please choose a smaller file.')
+        // }
         // 清空选择的文件
         e.target.value = '';
       }
