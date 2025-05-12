@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import clsx from 'clsx';
-import { IconButton } from '../IconButton';
-import { useLocale } from '../ConfigProvider';
+import { IconButton } from './IconButton';
 
 const UP = 'up';
 const DOWN = 'down';
@@ -13,18 +12,14 @@ export type RateActionsProps = {
 };
 
 export const RateActions: React.FC<RateActionsProps> = (props) => {
-  const { trans } = useLocale('RateActions', {
-    up: '赞同',
-    down: '反对',
-  });
 
-  const { upTitle = trans('up'), downTitle = trans('down'), onClick } = props;
+  const { upTitle = UP, downTitle = DOWN, onClick } = props;
   const [value, setValue] = useState('');
 
   function handleClick(val: string) {
+    setValue(val);
+    onClick(val);
     if (!value) {
-      setValue(val);
-      onClick(val);
     }
   }
 
@@ -38,7 +33,7 @@ export const RateActions: React.FC<RateActionsProps> = (props) => {
 
   return (
     <div className="RateActions">
-      {value !== DOWN && (
+      {(
         <IconButton
           className={clsx('RateBtn', { active: value === UP })}
           title={upTitle}
@@ -47,7 +42,7 @@ export const RateActions: React.FC<RateActionsProps> = (props) => {
           onClick={handleUpClick}
         />
       )}
-      {value !== UP && (
+      {(
         <IconButton
           className={clsx('RateBtn', { active: value === DOWN })}
           title={downTitle}
