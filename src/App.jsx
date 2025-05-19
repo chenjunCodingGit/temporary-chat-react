@@ -205,7 +205,7 @@ function App() {
       .catch(err => console.error('XLSX multi-sheet with advanced styles, comments, and protection export error:', err));
 
     // CSV export will only export the first sheet ("Product Details") and does not support comments or protection
-    exportData([sheet1Config, sheet2Config], 'Enterprise_Data_Report_Products_CSV', 'csv');
+    // exportData([sheet1Config, sheet2Config], 'Enterprise_Data_Report_Products_CSV', 'csv');
   };
 
 
