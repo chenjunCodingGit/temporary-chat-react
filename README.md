@@ -33,3 +33,53 @@ https://github.com/microsoft/omnichannel-chat-sdk
 你现在是一个拥有微软Azure经验的专家和软件架构师；需要从零实现上述的需求，首先需要去微软Dynamics 365 Customer Service中心配置Copilot agent (agent or AI agent). 
 然后结合这个github仓库，在web portal前端中实现整个功能。
 需要列出每一步的操作步骤和代码
+
+
+| 格式模式 | 示例输出 |
+| --- | --- |
+| YYYY - MM - DD | 2023 - 11 - 26 |
+| MM/DD/YYYY | 11/26/2023 |
+| DD - MM - YYYY | 26 - 11 - 2023 |
+| YYYY/MM/DD | 2023/11/26 |
+| M/D/YY | 11/26/23 |
+| MMM DD, YYYY | Nov 26, 2023 |
+| MMMM DD, YYYY | November 26, 2023 |
+| ddd, MMM DD YYYY | Sun, Nov 26 2023 |
+| dddd, MMMM DD YYYY | Sunday, November 26 2023 |
+| HH:MM:SS | 02:30:00 |
+| h:mm:ss AM/PM | 2:30:00 AM |
+| H:MM | 2:30 |
+| h:mm AM/PM | 2:30 AM |
+| YYYY - MM - DD HH:MM:SS | 2023 - 11 - 26 02:30:00 |
+| MM/DD/YYYY HH:MM | 11/26/2023 02:30 |
+| Elapsed Hours [h]:mm:ss | 25:30:45 |
+| Elapsed Minutes [m]:ss | 1530:45 |
+| Elapsed Seconds [s] | 91845 |
+| ISO Date String (Text) | 2023 - 10 - 26T10:30:00.000Z |
+| Custom Format: "Date is" YYYY - MM - DD | Date is 2023 - 11 - 26 |
+| Custom Format: "Time is" HH:MM | Time is 02:30 |
+
+
+| 格式模式 | 示例输出 |
+| --- | --- |
+| YYYY-MM-DD | 2023-11-26 |
+| MM/DD/YYYY | 11/26/2023 |
+| DD-MM-YYYY | 26-11-2023 |
+| YYYY/MM/DD | 2023/11/26 |
+| M/D/YY | 11/26/23 |
+| MMM DD, YYYY | Nov 26, 2023 |
+| MMMM DD, YYYY | November 26, 2023 |
+| ddd, MMM DD YYYY | Sun, Nov 26 2023 |
+| dddd, MMMM DD YYYY | Sunday, November 26 2023 |
+| HH:MM:SS | 02:30:00 |
+| h:mm:ss AM/PM | 2:30:00 AM |
+| H:MM | 2:30 |
+| h:mm AM/PM | 2:30 AM |
+| YYYY-MM-DD HH:MM:SS | 2023-11-26 02:30:00 |
+| MM/DD/YYYY HH:MM | 11/26/2023 02:30 |
+| Elapsed Hours [h]:mm:ss | 25:30:45 |
+| Elapsed Minutes [m]:ss | 1530:45 |
+| Elapsed Seconds [s] | 91845 |
+| ISO Date String (Text) | 2023-10-26T10:30:00.000Z |
+| Custom Format: "Date is" YYYY-MM-DD | Date is 2023-11-26 |
+| Custom Format: "Time is" HH:MM | Time is 02:30 |
