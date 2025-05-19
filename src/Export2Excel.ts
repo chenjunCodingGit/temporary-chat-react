@@ -1,5 +1,5 @@
 // src/Export2Excel.ts
-import ExcelJS, { Workbook, Worksheet, Cell, Style, Alignment, Font, Fill, Border, Borders } from 'exceljs';
+import ExcelJS, { Workbook, Worksheet, Cell, Style, Alignment, Font, Fill, Border, Borders, Comment } from 'exceljs'; // Import Comment type
 import saveAs from 'file-saver';
 
 // --- INTERFACES ---
@@ -36,6 +36,9 @@ export interface ColumnDefinition {
 
   hidden?: boolean; // If true, the column will be hidden
 
+  // Optional: Add a comment to the cell. Can be a string or a function.
+  comment?: string | ((value: any, rowData: DataObject, cell: Cell) => string | { text: string; author?: string });
+
   children?: ColumnDefinition[]; // For grouped headers
 }
 
@@ -55,7 +58,7 @@ export interface SheetConfig {
   columns: ColumnDefinition[];
   freezePanes?: { row: number; col: number }; // Optional: To freeze rows/columns
   showGridLines?: boolean; // Optional: default is true
-  // Add other sheet-specific options here if needed
+  password?: string; // Optional: Password to protect the worksheet
 }
 
 type ExportFormat = 'xlsx' | 'csv';
@@ -192,7 +195,7 @@ export const exportToExcel = async (
   workbook.modified = new Date();
 
   for (const config of sheetConfigs) {
-    const { sheetName, data, columns, freezePanes, showGridLines = true } = config;
+    const { sheetName, data, columns, freezePanes, showGridLines = true, password } = config; // Destructure password
     const worksheet: Worksheet = workbook.addWorksheet(sheetName);
 
     if (freezePanes) {
@@ -202,6 +205,11 @@ export const exportToExcel = async (
     }
     if (showGridLines === false) {
       worksheet.properties.showGridLines = false;
+    }
+
+    // Protect the worksheet if a password is provided
+    if (password) {
+      await worksheet.protect(password, {});
     }
 
 
@@ -247,8 +255,8 @@ export const exportToExcel = async (
       headerRow.commit();
     }
 
-    // Add data rows and apply styles
-    data.forEach((rowData) => {
+    // Add data rows and apply styles and comments
+    data.forEach((rowData, rowIndex) => {
       const row = worksheet.addRow(rowData); // Uses keys from worksheet.columns
       finalFlatColumns.forEach((colDef, colIndex) => {
         const cell = row.getCell(colIndex + 1);
@@ -293,6 +301,28 @@ export const exportToExcel = async (
         } else {
           cell.value = cellValue; // Ensure value is set if not hyperlink
         }
+
+        // Handle Comments
+        if (colDef.comment) {
+          let comment: Partial<Comment> = {};
+          if (typeof colDef.comment === 'string') {
+            
+            comment.texts = [{ text: colDef.comment }];
+          } else { // It's a function
+            const commentResult = colDef.comment(cellValue, rowData, cell);
+            if (typeof commentResult === 'string') {
+              
+              comment.texts = [{ text: commentResult }];
+            } else if (typeof commentResult === 'object' && commentResult !== null) {
+              // @ts-ignore
+              comment = { texts: [{ text: commentResult.text }], authorId: commentResult.author };
+            }
+          }
+          
+          if (comment.texts) {
+            cell.note = comment; // Use cell.note for comments
+          }
+        }
       });
     });
 
@@ -320,7 +350,10 @@ export const exportToExcel = async (
         const valueToMeasure = (colDef.isHyperlink && cell.value && typeof cell.value === 'object' && (cell.value as any).text)
           ? (cell.value as any).text
           : (cell.value ? String(cell.value) : '');
-        maxColumnLength = Math.max(maxColumnLength, valueToMeasure.length);
+        // Also consider comment text length if present
+        
+        const commentText = typeof cell.note === 'string' ? cell.note : (cell.note?.texts || '');
+        maxColumnLength = Math.max(maxColumnLength, valueToMeasure.length, commentText.length);
       }
       excelColumn.width = maxColumnLength < 10 ? 10 : maxColumnLength + 5; // Padding
     });
@@ -482,3 +515,4 @@ export const exportData = async (
   }
   return exportToExcel(sheetConfigs, fileName);
 };
+

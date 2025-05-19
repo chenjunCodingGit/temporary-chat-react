@@ -4,7 +4,7 @@ import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 // 确保从正确路径导入，并且 Export2Excel.ts 导出了这些类型
-import { exportData,  } from './Export2Excel'; 
+import { exportData, } from './Export2Excel';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -13,8 +13,8 @@ function App() {
 
   // Sheet 1: "Product Details" - with grouped headers and advanced styles
   const productsData = [
-    { 
-      id: 'P001', 
+    {
+      id: 'P001',
       name: 'Smartwatch V3 Pro',
       category: 'Wearables',
       launchDate: '2024-01-15',
@@ -24,10 +24,10 @@ function App() {
       status: 'Bestseller',
       storeLink: { text: 'Visit Official Site', hyperlink: 'https://example.com/store/P001', tooltip: 'Go to P001 official page' },
       features: 'GPS, Heart Rate, NFC Payment\nWater Resistance: 5ATM',
-      internalNotes: 'Pay attention to next-gen chip supply' 
+      internalNotes: 'Pay attention to next-gen chip supply'
     },
-    { 
-      id: 'P002', 
+    {
+      id: 'P002',
       name: 'AirSound Max Noise Cancelling Headphones',
       category: 'Audio',
       launchDate: '2023-08-20',
@@ -37,7 +37,7 @@ function App() {
       status: 'Hot',
       storeLink: 'https://example.com/store/P002',
       features: 'Active Noise Cancellation, Bluetooth 5.2, 20hr battery',
-      internalNotes: 'Marketing campaign very effective' 
+      internalNotes: 'Marketing campaign very effective'
     },
     {
       id: 'P003',
@@ -50,66 +50,75 @@ function App() {
       status: 'New Recommendation',
       storeLink: { text: 'Product Specs', hyperlink: 'https://example.com/specs/P003' },
       features: '34-inch, 144Hz Refresh Rate, HDR400',
-      internalNotes: 'Initial stock is tight' 
+      internalNotes: 'Initial stock is tight'
     }
   ];
 
+  // Updated productColumns with comments
   const productColumns = [
-    { 
-      header: 'Product ID', key: 'id', width: 15, 
-      headerStyle: { 
+    {
+      header: 'Product ID', key: 'id', width: 15,
+      headerStyle: {
         font: { name: 'Arial Black', color: { argb: 'FF003366' }, size: 12 },
         fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFDAEEF3' } }
       },
-      dataStyle: { 
+      dataStyle: {
         font: { italic: true, color: { argb: 'FF444444' } },
         alignment: { horizontal: 'center' }
-      }
+      },
+      // Example of a static string comment
+      comment: 'Unique identifier for each product.'
     },
     {
       header: 'Core Product Info',
       children: [
-        { 
+        {
           header: 'Product Name', key: 'name', width: 30, alignment: 'left',
           headerStyle: { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } } },
-          dataStyle: { font: { bold: true, color: {argb: 'FF2E8B57'} } } 
+          dataStyle: { font: { bold: true, color: { argb: 'FF2E8B57' } } },
+          // Example of a function-based comment
+          comment: (value) => `Product name: ${value}`
         },
-        { 
+        {
           header: 'Category', key: 'category', width: 18, alignment: 'left',
           headerStyle: { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFC6EFCE' } } }
         },
       ],
     },
-    { 
+    {
       header: 'Launch Date', key: 'launchDate', width: 18, format: 'yyyy"-"mm"-"dd', alignment: 'center',
       headerStyle: { font: { size: 10 } },
-      dataStyle: { numFmt: 'yyyy-mm-dd;@', alignment: { horizontal: 'right'} }
+      dataStyle: { numFmt: 'yyyy-mm-dd;@', alignment: { horizontal: 'right' } }
     },
     {
       header: 'Sales & Feedback',
       headerStyle: { fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFF0E1' } } },
       children: [
-        { 
+        {
           header: 'Units Sold', key: 'unitsSold', width: 12, format: '#,##0', alignment: 'right',
-          dataStyle: { font: { color: { argb: 'FF0070C0' } } } 
+          dataStyle: { font: { color: { argb: 'FF0070C0' } } },
+          // Example of a function-based comment with author
+          comment: (value, rowData) => ({ text: `Total units sold: ${value}`, author: 'Sales Team' })
         },
-        { 
+        {
           header: 'Revenue (CNY)', key: 'revenue', width: 18, format: '¥#,##0.00', alignment: 'right',
           dataStyle: { font: { color: { argb: 'FF0070C0' }, bold: true } }
         },
-        { 
+        {
           header: 'Customer Satisfaction', key: 'satisfaction', width: 15, format: '0.00%', alignment: 'center',
           dataStyle: (value) => {
             if (value == null) return { font: { color: { argb: 'FF808080' } } };
             const numericValue = Number(value);
-            if (numericValue >= 0.95) return { font: { color: { argb: 'FF008000' }, bold: true }, fill: {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFCCFFCC'}} };
+            if (numericValue >= 0.95) return { font: { color: { argb: 'FF008000' }, bold: true }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFCCFFCC' } } };
             if (numericValue >= 0.90) return { font: { color: { argb: 'FF228B22' } } };
             return { font: { color: { argb: 'FFFF4500' } } };
-          }
+          },
+          // Example of a simple string comment
+          comment: 'Customer satisfaction score (0-1).'
         }
       ]
     },
-    { 
+    {
       header: 'Current Status', key: 'status', width: 15, alignment: 'center',
       dataStyle: (value) => {
         let style = {};
@@ -119,15 +128,15 @@ function App() {
         return style;
       }
     },
-    { 
+    {
       header: 'Official Link', key: 'storeLink', width: 25, isHyperlink: true,
       dataStyle: { alignment: { horizontal: 'left' } }
     },
-    { 
+    {
       header: 'Features', key: 'features', width: 35, alignment: 'left',
-      dataStyle: { alignment: { wrapText: true, vertical: 'top' } } 
+      dataStyle: { alignment: { wrapText: true, vertical: 'top' } }
     },
-    { header: 'Internal Notes (Hidden)', key: 'internalNotes', hidden: true}
+    { header: 'Internal Notes (Hidden)', key: 'internalNotes', hidden: true }
   ];
 
   // Sheet 2: "Employee Directory" - simple header, different styles
@@ -138,20 +147,20 @@ function App() {
     { empId: 'E004', name: 'Liu Qiangdong', department: 'Management', email: 'liu.qiangdong@example.com', extension: 'x0001', status: 'Active' },
   ];
   const employeeColumns = [
-    { 
-      header: 'Employee ID', key: 'empId', width: 10, 
-      headerStyle: { 
-        font: { color: { argb: 'FFFFFFFF'}, bold: true, name: 'Segoe UI Semibold' }, 
-        fill: {type: 'pattern', pattern: 'solid', fgColor: {argb: 'FF4F81BD'}}
+    {
+      header: 'Employee ID', key: 'empId', width: 10,
+      headerStyle: {
+        font: { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Segoe UI Semibold' },
+        fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF4F81BD' } }
       },
-      dataStyle: { alignment: {horizontal: 'center'}}
+      dataStyle: { alignment: { horizontal: 'center' } }
     },
-    { 
-      header: 'Name', key: 'name', width: 15, 
-      dataStyle: { font: { name: 'Microsoft YaHei', size: 11 } } 
+    {
+      header: 'Name', key: 'name', width: 15,
+      dataStyle: { font: { name: 'Microsoft YaHei', size: 11 } }
     },
     { header: 'Department', key: 'department', width: 20 },
-    { 
+    {
       header: 'Email', key: 'email', width: 30, isHyperlink: true,
       dataStyle: (value) => ({
         text: String(value),
@@ -159,12 +168,14 @@ function App() {
       })
     },
     { header: 'Extension', key: 'extension', width: 12, alignment: 'center' },
-    { 
+    {
       header: 'Status', key: 'status', width: 10, alignment: 'center',
       dataStyle: (value) => {
-        if (value === 'On Leave') return { font: { color: { argb: 'FFB8860B' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: {argb: 'FFFFFACD'} } };
+        if (value === 'On Leave') return { font: { color: { argb: 'FFB8860B' } }, fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFACD' } } };
         return {};
-      }
+      },
+      // Example of a function-based comment for specific status
+      comment: (value) => value === 'On Leave' ? 'Employee is currently on leave.' : undefined
     }
   ];
 
@@ -176,6 +187,8 @@ function App() {
       columns: productColumns,
       freezePanes: { row: 2, col: 1 },
       showGridLines: true,
+      // Add password protection to Sheet 1
+      password: 'productpassword123'
     };
     const sheet2Config = {
       sheetName: 'Employee Directory',
@@ -183,16 +196,18 @@ function App() {
       columns: employeeColumns,
       freezePanes: { row: 1, col: 0 },
       showGridLines: false,
+      // Add password protection to Sheet 2
+      password: 'employeepassword456'
     };
 
     exportData([sheet1Config, sheet2Config], 'Enterprise_Data_Report_MultiSheet', 'xlsx')
-      .then(() => console.log('XLSX multi-sheet with advanced styles export complete'))
-      .catch(err => console.error('XLSX multi-sheet with advanced styles export error:', err));
-    
-    // CSV export will only export the first sheet ("Product Details")
+      .then(() => console.log('XLSX multi-sheet with advanced styles, comments, and protection export complete'))
+      .catch(err => console.error('XLSX multi-sheet with advanced styles, comments, and protection export error:', err));
+
+    // CSV export will only export the first sheet ("Product Details") and does not support comments or protection
     exportData([sheet1Config, sheet2Config], 'Enterprise_Data_Report_Products_CSV', 'csv');
   };
-  
+
 
   return (
     <>
@@ -211,11 +226,11 @@ function App() {
         </button>
       </div>
       <div style={{ display: 'flex', flexDirection: 'column', gap: '15px', alignItems: 'center', marginTop: '20px' }}>
-        <button 
-          onClick={handleExportMultiSheetWithStyles} 
+        <button
+          onClick={handleExportMultiSheetWithStyles}
           style={{ padding: '12px 25px', fontSize: '16px', background: '#007bff', color: 'white', border: 'none', borderRadius: '5px', cursor: 'pointer' }}
         >
-          Export Multi-Sheet Report (Advanced Styles)
+          Export Multi-Sheet Report (Advanced Styles, Comments, Protection)
         </button>
       </div>
     </>
