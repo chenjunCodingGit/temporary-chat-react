@@ -1,22 +1,32 @@
 // src/Export2Excel.ts
-import ExcelJS from 'exceljs';
+import ExcelJS, { Workbook, Worksheet } from 'exceljs'; // Explicitly import Workbook and Worksheet
 import saveAs from 'file-saver';
 
+// Column definition remains the same
 interface ColumnDefinition {
   header: string;
   key: string;
   width?: number;
   alignment?: 'left' | 'center' | 'right';
   format?: string;
-  children?: ColumnDefinition[];
+  children?: ColumnDefinition[]; // For grouped headers
 }
 
+// Data object definition remains the same
 interface DataObject {
   [key: string]: string | number | boolean | null | undefined;
 }
 
+// New interface for individual sheet configuration
+export interface SheetConfig { // Exporting this interface for use in App.jsx
+  sheetName: string;
+  data: DataObject[];
+  columns: ColumnDefinition[];
+}
+
 type ExportFormat = 'xlsx' | 'csv';
 
+// Helper function to flatten column definitions
 const flattenColumns = (columns: ColumnDefinition[]): ColumnDefinition[] => {
   let flat: ColumnDefinition[] = [];
   columns.forEach(col => {
@@ -29,29 +39,27 @@ const flattenColumns = (columns: ColumnDefinition[]): ColumnDefinition[] => {
   return flat;
 };
 
-// Renamed to avoid conflict if this file is part of a larger module
-// and to make its purpose clearer within this function's scope.
-let currentMaxHeaderDepth = 0;
-
-function calculateExcelMaxHeaderDepth(cols: ColumnDefinition[], currentDepth: number) {
+// Helper to calculate max header depth for a given set of columns
+let currentMaxHeaderDepth = 0; // This will be reset for each sheet
+function calculateSheetMaxHeaderDepth(cols: ColumnDefinition[], currentDepth: number) {
   currentMaxHeaderDepth = Math.max(currentMaxHeaderDepth, currentDepth);
   cols.forEach(col => {
     if (col.children && col.children.length > 0) {
-      calculateExcelMaxHeaderDepth(col.children, currentDepth + 1);
+      calculateSheetMaxHeaderDepth(col.children, currentDepth + 1);
     }
   });
 }
 
-function buildAndMergeHeadersXLSX(
-  worksheet: ExcelJS.Worksheet,
+// Helper to build and merge headers for a single worksheet
+function buildAndMergeHeadersForSheet(
+  worksheet: Worksheet,
   columns: ColumnDefinition[],
-  currentRecursiveDepth: number, // Current depth in the recursion
-  baseHeaderRowIndex: number,    // The 1-based row index where headers start
-  startDataColumnIndex: number,  // The 1-based column index in the Excel sheet
-  totalActualHeaderRows: number  // Total number of rows headers will occupy
-): number { // Returns the next available data column index
+  currentRecursiveDepth: number,
+  baseHeaderRowIndex: number,
+  startDataColumnIndex: number,
+  totalActualHeaderRows: number
+): number {
   let currentExcelColIdx = startDataColumnIndex;
-
   columns.forEach(colDef => {
     const headerActualRow = baseHeaderRowIndex + currentRecursiveDepth;
     const cell = worksheet.getCell(headerActualRow, currentExcelColIdx);
@@ -73,141 +81,113 @@ function buildAndMergeHeadersXLSX(
           currentExcelColIdx + numberOfLeafChildren - 1
         );
       }
-      // Recursively build children headers on the next row
-      buildAndMergeHeadersXLSX(
+      buildAndMergeHeadersForSheet(
         worksheet,
         colDef.children,
         currentRecursiveDepth + 1,
         baseHeaderRowIndex,
-        currentExcelColIdx, // Children start at the same column index as the parent
+        currentExcelColIdx,
         totalActualHeaderRows
       );
       currentExcelColIdx += numberOfLeafChildren;
     } else {
-      // This is a leaf node or a header without children.
-      // It should span downwards if it's not at the deepest header level.
       if (currentRecursiveDepth < totalActualHeaderRows - 1) {
         worksheet.mergeCells(
           headerActualRow,
           currentExcelColIdx,
-          baseHeaderRowIndex + totalActualHeaderRows - 1, // Merge down to the last header row
+          baseHeaderRowIndex + totalActualHeaderRows - 1,
           currentExcelColIdx
         );
       }
       currentExcelColIdx++;
     }
   });
-  return currentExcelColIdx; // Return the next column index to start from for the next header at this level
+  return currentExcelColIdx;
 }
 
-
+// Modified to handle an array of SheetConfig for XLSX
 export const exportToExcel = async (
-  data: DataObject[],
-  columns: ColumnDefinition[],
+  sheetConfigs: SheetConfig[], // Accepts an array of sheet configurations
   fileName: string = 'exported_data'
 ): Promise<void> => {
-  const workbook = new ExcelJS.Workbook();
-  const worksheet = workbook.addWorksheet('Sheet1');
-
-  const isGrouped = columns.some(col => col.children && col.children.length > 0);
-  const finalFlatColumns = flattenColumns(columns);
-  let headerRowCount = 1;
-
-  // Set up the basic column structure for data mapping
-  // The `header` property here is not used for display if grouped,
-  // but `key` is crucial for `worksheet.addRow(rowData)`.
-  worksheet.columns = finalFlatColumns.map(col => ({
-    key: col.key,
-    width: col.width || 20, // Default width, will be overridden by auto-fit later
-    // For non-grouped, this header will be used by the first row.
-    // For grouped, headers are written manually by buildAndMergeHeadersXLSX.
-  }));
-
-  if (isGrouped) {
-    currentMaxHeaderDepth = 0; // Reset global for this export
-    calculateExcelMaxHeaderDepth(columns, 0);
-    headerRowCount = currentMaxHeaderDepth + 1;
-    // buildAndMergeHeadersXLSX will write to rows 1 through headerRowCount
-    buildAndMergeHeadersXLSX(worksheet, columns, 0, 1, 1, headerRowCount);
-  } else {
-    // Single header row for non-grouped columns
-    const headerRow = worksheet.getRow(1); // Get the first row
-    columns.forEach((col, index) => {
-      const cell = headerRow.getCell(index + 1);
-      cell.value = col.header;
-      cell.font = { bold: true };
-      cell.alignment = { vertical: 'middle', horizontal: 'center' };
-      cell.border = {
-        top: { style: 'thin' }, left: { style: 'thin' },
-        bottom: { style: 'thin' }, right: { style: 'thin' }
-      };
-    });
-    // Ensure the row is committed if only styling was applied to an existing header from worksheet.columns
-     if (headerRow.values.length === 0 && columns.length > 0) { // if row was conceptually empty
-        headerRow.values = columns.map(c => c.header); // then set its values
-        headerRow.commit();
-     }
+  if (!sheetConfigs || sheetConfigs.length === 0) {
+    console.error("No sheet configurations provided for Excel export.");
+    return;
   }
 
-  // Add data rows starting AFTER the header rows
-  // worksheet.addRows(data) will append after the last existing row.
-  // If headers correctly occupy 'headerRowCount' rows, data starts on headerRowCount + 1.
-  data.forEach((rowData, rowIndex) => {
-    // It's safer to get the specific row number for data if addRows is problematic
-    // However, if worksheet.columns is set up with keys, addRow(object) should work as expected.
-    // Let's ensure worksheet.columns has been set up correctly before this point.
-    // The `worksheet.columns` assignment above should handle keys correctly.
-    const row = worksheet.addRow(rowData); //This should append correctly if headers are done.
+  const workbook: Workbook = new ExcelJS.Workbook();
+  workbook.creator = 'YourAppName';
+  workbook.created = new Date();
+  workbook.modified = new Date();
 
-    // Apply cell-level styling to data rows
-    finalFlatColumns.forEach((col, colIndex) => {
-      const cell = row.getCell(colIndex + 1);
-      
-      cell.alignment = {
-        vertical: 'middle',
-        horizontal: col.alignment || 'left',
-      };
+  for (const config of sheetConfigs) {
+    const { sheetName, data, columns } = config;
+    const worksheet: Worksheet = workbook.addWorksheet(sheetName);
 
-      if (col.format) {
-        cell.numFmt = col.format;
+    const isGrouped = columns.some(col => col.children && col.children.length > 0);
+    const finalFlatColumns = flattenColumns(columns);
+    let headerRowCount = 1;
+
+    worksheet.columns = finalFlatColumns.map(col => ({
+      key: col.key,
+      width: col.width || 20,
+    }));
+
+    if (isGrouped) {
+      currentMaxHeaderDepth = 0; // Reset depth for current sheet
+      calculateSheetMaxHeaderDepth(columns, 0);
+      headerRowCount = currentMaxHeaderDepth + 1;
+      buildAndMergeHeadersForSheet(worksheet, columns, 0, 1, 1, headerRowCount);
+    } else {
+      const headerRow = worksheet.getRow(1);
+      columns.forEach((col, index) => {
+        const cell = headerRow.getCell(index + 1);
+        cell.value = col.header;
+        cell.font = { bold: true };
+        cell.alignment = { vertical: 'middle', horizontal: 'center' };
+        cell.border = {
+          top: { style: 'thin' }, left: { style: 'thin' },
+          bottom: { style: 'thin' }, right: { style: 'thin' }
+        };
+      });
+      if (headerRow.values.length === 0 && columns.length > 0) {
+         headerRow.values = columns.map(c => c.header);
       }
-      // Optionally add default borders to data cells if desired
-      // cell.border = { ... };
-    });
-  });
-  
-  // Auto-fit column width
-  worksheet.columns.forEach((excelColumn, index) => {
-    if (!excelColumn || typeof excelColumn.eachCell !== 'function' ) return;
-    
-    let maxColumnLength = 0;
-    const currentFlatColumnDef = finalFlatColumns[index]; // The actual leaf column definition
-
-    // 1. Consider header text for width calculation
-    // Iterate through all potential header cells for this physical column
-    for (let i = 1; i <= headerRowCount; i++) {
-      const headerCell = worksheet.getCell(i, index + 1); // (row, col) are 1-based
-      const headerText = headerCell.text || (headerCell.value ? headerCell.value.toString() : '');
-      const headerTextLength = headerText.length;
-      if (headerTextLength > maxColumnLength) {
-        maxColumnLength = headerTextLength;
-      }
+      headerRow.commit();
     }
-    
-    // 2. Consider data cell content for width calculation
-    // Iterate over data rows (rows after headerRowCount)
-    for (let i = 0; i < data.length; i++) {
-        const dataRowIndexOnSheet = headerRowCount + 1 + i;
-        const cell = worksheet.getCell(dataRowIndexOnSheet, index + 1);
-        const cellValue = cell.value;
-        const columnLength = cellValue ? cellValue.toString().length : 0;
-        if (columnLength > maxColumnLength) {
-            maxColumnLength = columnLength;
+
+    data.forEach((rowData) => {
+      const row = worksheet.addRow(rowData);
+      finalFlatColumns.forEach((col, colIndex) => {
+        const cell = row.getCell(colIndex + 1);
+        cell.alignment = {
+          vertical: 'middle',
+          horizontal: col.alignment || 'left',
+        };
+        if (col.format) {
+          cell.numFmt = col.format;
         }
-    }
+      });
+    });
     
-    excelColumn.width = maxColumnLength < 10 ? 10 : maxColumnLength + 4; // Adjusted padding
-  });
+    worksheet.columns.forEach((excelColumn, index) => {
+        if (!excelColumn || typeof excelColumn.eachCell !== 'function' ) return;
+        let maxColumnLength = 0;
+        for (let i = 1; i <= headerRowCount; i++) {
+            const headerCell = worksheet.getCell(i, index + 1);
+            const headerText = headerCell.text || (headerCell.value ? headerCell.value.toString() : '');
+            maxColumnLength = Math.max(maxColumnLength, headerText.length);
+        }
+        for (let i = 0; i < data.length; i++) {
+            const dataRowIndexOnSheet = headerRowCount + 1 + i;
+            const cell = worksheet.getCell(dataRowIndexOnSheet, index + 1);
+            const cellValue = cell.value;
+            const columnLength = cellValue ? cellValue.toString().length : 0;
+            maxColumnLength = Math.max(maxColumnLength, columnLength);
+        }
+        excelColumn.width = maxColumnLength < 10 ? 10 : maxColumnLength + 4;
+    });
+  } // End of loop for sheetConfigs
 
   const buffer = await workbook.xlsx.writeBuffer();
   saveAs(
@@ -235,18 +215,21 @@ const formatValue = (value: any, format?: string): string => {
         return `${currencySymbol}${formatted}`;
       }
     }
-    else if (format === 'yyyy-mm-dd') {
+    else if (format === 'yyyy-mm-dd' || format === 'yyyy/mm/dd') { // Added yyyy/mm/dd
       const date = new Date(value);
       if (!isNaN(date.getTime())) {
-        return date.toISOString().split('T')[0];
+        const year = date.getFullYear();
+        const month = (date.getMonth() + 1).toString().padStart(2, '0');
+        const day = date.getDate().toString().padStart(2, '0');
+        if (format === 'yyyy/mm/dd') return `${year}/${month}/${day}`;
+        return `${year}-${month}-${day}`;
       }
     }
   }
-  return String(value).replace(/"/g, '""'); // Escape double quotes for CSV
+  return String(value).replace(/"/g, '""');
 };
 
-// getCsvHeaderRows and exportToCSV remain largely the same,
-// but ensure getCsvHeaderRows also uses calculateExcelMaxHeaderDepth correctly.
+// getCsvHeaderRows remains the same, used by exportToCSV for a single sheet
 let csvMaxHeaderDepth = 0;
 function calculateCsvMaxHeaderDepth(cols: ColumnDefinition[], currentDepth: number) {
   csvMaxHeaderDepth = Math.max(csvMaxHeaderDepth, currentDepth);
@@ -257,19 +240,15 @@ function calculateCsvMaxHeaderDepth(cols: ColumnDefinition[], currentDepth: numb
   });
 }
 
-
 const getCsvHeaderRows = (columns: ColumnDefinition[]): string[][] => {
     const finalFlatCols = flattenColumns(columns);
     const numLeafColumns = finalFlatCols.length;
-
-    csvMaxHeaderDepth = 0; // Reset for this CSV export
+    csvMaxHeaderDepth = 0; 
     calculateCsvMaxHeaderDepth(columns, 0);
     const totalHeaderLevels = csvMaxHeaderDepth + 1;
-
     const headerRowsOutput: string[][] = Array.from({ length: totalHeaderLevels }, () => 
         new Array(numLeafColumns).fill('')
     );
-
     function populateHeadersRecursive(
         colsToProcess: ColumnDefinition[], 
         currentDepth: number, 
@@ -280,18 +259,12 @@ const getCsvHeaderRows = (columns: ColumnDefinition[]): string[][] => {
             const cellValue = `"${colDef.header.replace(/"/g, '""')}"`;
             if (colDef.children && colDef.children.length > 0) {
                 const childLeafCount = flattenColumns(colDef.children).length;
-                // Place the group header and span it by filling the first cell of the span
                 if (childLeafCount > 0) {
                     headerRowsOutput[currentDepth][currentCsvColStartIdx + cumulativeLeafCount] = cellValue;
-                    // Optionally, fill subsequent cells in the span for better text editor view:
-                    // for (let i = 1; i < childLeafCount; i++) {
-                    //   headerRowsOutput[currentDepth][currentCsvColStartIdx + cumulativeLeafCount + i] = ' '; // or `""`
-                    // }
                 }
                 populateHeadersRecursive(colDef.children, currentDepth + 1, currentCsvColStartIdx + cumulativeLeafCount);
                 cumulativeLeafCount += childLeafCount;
             } else {
-                // Leaf node, fill it down to the max depth
                 for (let d = currentDepth; d < totalHeaderLevels; d++) {
                     headerRowsOutput[d][currentCsvColStartIdx + cumulativeLeafCount] = cellValue;
                 }
@@ -300,17 +273,16 @@ const getCsvHeaderRows = (columns: ColumnDefinition[]): string[][] => {
         });
         return cumulativeLeafCount;
     }
-
     populateHeadersRecursive(columns, 0, 0);
     return headerRowsOutput;
 };
 
-
+// exportToCSV now takes a single SheetConfig
 export const exportToCSV = (
-  data: DataObject[],
-  columns: ColumnDefinition[],
+  sheetConfig: SheetConfig, // Accepts a single sheet configuration
   fileName: string
 ): void => {
+  const { data, columns } = sheetConfig;
   const flatDataColumns = flattenColumns(columns);
   const isGrouped = columns.some(col => col.children && col.children.length > 0);
   let csvHeaderString: string;
@@ -339,15 +311,23 @@ export const exportToCSV = (
   saveAs(blob, `${fileName}.csv`);
 };
 
+// exportData now handles SheetConfig[] for XLSX and the first sheet for CSV
 export const exportData = async (
-  data: DataObject[],
-  columns: ColumnDefinition[],
+  sheetConfigs: SheetConfig[], // Can be single or multiple sheet configs
   fileName: string = 'exported_data',
   format: ExportFormat = 'xlsx'
 ): Promise<void> => {
+  if (!sheetConfigs || sheetConfigs.length === 0) {
+    console.error("No sheet data provided for export.");
+    return;
+  }
+
   if (format === 'csv') {
-    exportToCSV(data, columns, fileName);
+    if (sheetConfigs.length > 1) {
+      console.warn("CSV export does not support multiple sheets. Exporting the first sheet only.");
+    }
+    exportToCSV(sheetConfigs[0], fileName); // Export only the first sheet for CSV
     return Promise.resolve();
   }
-  return exportToExcel(data, columns, fileName);
+  return exportToExcel(sheetConfigs, fileName); // Pass all sheet configs for XLSX
 };
