@@ -75,7 +75,7 @@ function App() {
       // Add more column definitions as needed
     ];
 
-    exportToExcel(backendData, columns, 'product_data');
+    // exportToExcel(backendData, columns, 'product_data');
     exportData(backendData, columns, 'product_data_2', 'csv');
   };
 

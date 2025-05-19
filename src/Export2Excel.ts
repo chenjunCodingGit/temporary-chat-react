@@ -128,38 +128,43 @@ const exportToCSV = (
   columns: ColumnDefinition[],
   fileName: string
 ): void => {
-  // Calculate max width for each column based on content
+  // Calculate max width for each column based on content and format
   const columnWidths = columns.map(col => {
     let maxWidth = col.header.length;
     
+    // Check all values in this column including formatted values
     data.forEach(row => {
       const formattedValue = formatValue(row[col.key], col.format);
       maxWidth = Math.max(maxWidth, formattedValue.length);
     });
-    
-    return maxWidth;
+    console.log(`Max width for column ${col.header}: ${maxWidth}`);
+    // Add some padding for better readability
+    return maxWidth + 6; // Add 6 spaces padding
   });
 
-  // Create header row with proper alignment
+  // Create header row with proper alignment and fixed width
   const header = columns.map((col, index) => {
-    let value = col.header;
+    const value = col.header;
     const width = columnWidths[index];
-    const padding = ' '.repeat(width - value.length);
-    
+    const totalPadding = width - value.length;
+    const padding = totalPadding > 0 ? ' '.repeat(totalPadding) : '';
+    console.log(`Header value: ${value}, Padding: ${padding}`);
+    let alignedValue = '';
     switch (col.alignment) {
       case 'right':
-        value = padding + value;
+        alignedValue = padding + value;
         break;
       case 'center':
-        const leftPad = ' '.repeat(Math.floor(padding.length / 2));
-        const rightPad = ' '.repeat(Math.ceil(padding.length / 2));
-        value = leftPad + value + rightPad;
+        const leftPad = ' '.repeat(Math.floor(totalPadding / 2));
+        const rightPad = ' '.repeat(Math.ceil(totalPadding / 2));
+        alignedValue = leftPad + value + rightPad;
         break;
       default: // 'left'
-        value = value + padding;
+        alignedValue = value + padding;
     }
     
-    return value;
+    // Quote the header if it contains commas
+    return alignedValue.includes(',') ? `"${alignedValue}"` : alignedValue;
   }).join(',');
 
   // Create data rows with formatting and alignment
@@ -168,22 +173,21 @@ const exportToCSV = (
       const rawValue = item[col.key];
       const formattedValue = formatValue(rawValue, col.format);
       const width = columnWidths[index];
-      const padding = ' '.repeat(width - formattedValue.length);
+      const totalPadding = width - formattedValue.length;
       
-      let value = formattedValue;
-      
-      // Apply alignment
+      // Apply alignment and padding
+      let value = '';
       switch (col.alignment) {
         case 'right':
-          value = padding + value;
+          value = ' '.repeat(totalPadding) + formattedValue;
           break;
         case 'center':
-          const leftPad = ' '.repeat(Math.floor(padding.length / 2));
-          const rightPad = ' '.repeat(Math.ceil(padding.length / 2));
-          value = leftPad + value + rightPad;
+          const leftPad = ' '.repeat(Math.floor(totalPadding / 2));
+          const rightPad = ' '.repeat(Math.ceil(totalPadding / 2));
+          value = leftPad + formattedValue + rightPad;
           break;
         default: // 'left'
-          value = value + padding;
+          value = formattedValue + ' '.repeat(totalPadding);
       }
       
       // Escape values containing commas or quotes
