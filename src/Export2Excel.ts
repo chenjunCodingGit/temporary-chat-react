@@ -1,72 +1,56 @@
 // src/Export2Excel.ts
-import ExcelJS, { Workbook, Worksheet, Cell, Style, Alignment, Font, Fill, Border, Borders } from 'exceljs';
+import ExcelJS, { Workbook, Worksheet, Cell, Style, Alignment, Font, Fill, Border, ImagePosition } from 'exceljs';
 import saveAs from 'file-saver';
 
 // --- INTERFACES ---
-/**
- * Defines the style for a cell (header or data).
- */
-export interface CellStyle { // Exporting for use in App.jsx
+export interface CellStyle {
   font?: Partial<Font>;
   fill?: Fill;
-  border?: Partial<Borders>;
+  border?: Partial<Border>;
   alignment?: Partial<Alignment>;
   numFmt?: string;
 }
 
-/**
- * Defines the configuration for a single column.
- */
+export interface ImageOptions {
+  width: number; // Image width in pixels
+  height: number; // Image height in pixels
+  hyperlink?: string; // Optional hyperlink for the image
+  altText?: string; // Optional alt text (Excel doesn't directly show this, but good for data)
+}
+
 export interface ColumnDefinition {
-  header: string; // Text for the header
-  key: string;    // Key in the data object
-
-  width?: number; // Explicit column width in Excel's character units
-  format?: string; // Shortcut for dataStyle.numFmt (e.g., 'yyyy-mm-dd', '$#,##0.00')
-  alignment?: 'left' | 'center' | 'right'; // Shortcut for dataStyle.alignment.horizontal
-
-  headerStyle?: CellStyle; // Custom style for the header cell of this column
-  // Style for data cells. Can be an object or a function for dynamic styling.
+  header: string;
+  key: string;
+  width?: number;
+  format?: string;
+  alignment?: 'left' | 'center' | 'right';
+  headerStyle?: CellStyle;
   dataStyle?: CellStyle | ((value: any, rowData: DataObject, cell: Cell) => CellStyle);
-
-  // If true, cell value is treated as a hyperlink.
-  // Value can be a URL string (text and link are the same)
-  // or an object: { text: string; hyperlink: string; tooltip?: string }
   isHyperlink?: boolean;
-
-  hidden?: boolean; // If true, the column will be hidden
-
-  children?: ColumnDefinition[]; // For grouped headers
+  isImage?: boolean; // True if this column contains image URLs
+  imageOptions?: ImageOptions; // Options for displaying images
+  hidden?: boolean;
+  children?: ColumnDefinition[];
 }
 
-/**
- * Represents a single row of data.
- */
 interface DataObject {
-  [key: string]: any; // Values can be of any type, will be converted for Excel
+  [key: string]: any;
 }
 
-/**
- * Configuration for a single worksheet.
- */
 export interface SheetConfig {
   sheetName: string;
   data: DataObject[];
   columns: ColumnDefinition[];
-  freezePanes?: { row: number; col: number }; // Optional: To freeze rows/columns
-  showGridLines?: boolean; // Optional: default is true
-  // Add other sheet-specific options here if needed
+  freezePanes?: { row: number; col: number };
+  showGridLines?: boolean;
 }
 
 type ExportFormat = 'xlsx' | 'csv';
 
+// --- HELPER FUNCTIONS (flattenColumns, calculateSheetMaxHeaderDepth, applyCellStyle, buildAndMergeHeadersForSheet) ---
+// These helpers remain largely the same as in the previous version with advanced styling.
+// For brevity, they are not repeated here but are assumed to be present.
 
-// --- HELPER FUNCTIONS ---
-
-/**
- * Flattens nested column definitions into a single-level array.
- * This is used for data mapping and determining the actual columns in the sheet.
- */
 const flattenColumns = (columns: ColumnDefinition[]): ColumnDefinition[] => {
   let flat: ColumnDefinition[] = [];
   columns.forEach(col => {
@@ -79,11 +63,8 @@ const flattenColumns = (columns: ColumnDefinition[]): ColumnDefinition[] => {
   return flat;
 };
 
-let currentMaxHeaderDepth = 0; // Module-level variable, reset for each sheet processing in XLSX
+let currentMaxHeaderDepth = 0; 
 
-/**
- * Calculates the maximum depth of grouped headers for a given set of columns.
- */
 function calculateSheetMaxHeaderDepth(cols: ColumnDefinition[], currentDepth: number) {
   currentMaxHeaderDepth = Math.max(currentMaxHeaderDepth, currentDepth);
   cols.forEach(col => {
@@ -93,27 +74,21 @@ function calculateSheetMaxHeaderDepth(cols: ColumnDefinition[], currentDepth: nu
   });
 }
 
-/**
- * Applies a CellStyle object to an ExcelJS cell.
- */
 function applyCellStyle(cell: Cell, style?: CellStyle) {
   if (!style) return;
   if (style.font) cell.font = { ...cell.font, ...style.font };
-  if (style.fill) cell.fill = style.fill; // Fill is an object, not partial
+  if (style.fill) cell.fill = style.fill;
   if (style.border) cell.border = { ...cell.border, ...style.border };
   if (style.alignment) cell.alignment = { ...cell.alignment, ...style.alignment };
   if (style.numFmt) cell.numFmt = style.numFmt;
 }
 
-/**
- * Recursively builds header rows and merges cells for grouped headers on a worksheet.
- */
 function buildAndMergeHeadersForSheet(
   worksheet: Worksheet,
   columns: ColumnDefinition[],
   currentRecursiveDepth: number,
-  baseHeaderRowIndex: number, // 1-based
-  startDataColumnIndex: number, // 1-based
+  baseHeaderRowIndex: number, 
+  startDataColumnIndex: number, 
   totalActualHeaderRows: number
 ): number {
   let currentExcelColIdx = startDataColumnIndex;
@@ -121,19 +96,15 @@ function buildAndMergeHeadersForSheet(
     const headerActualRow = baseHeaderRowIndex + currentRecursiveDepth;
     const cell = worksheet.getCell(headerActualRow, currentExcelColIdx);
     cell.value = colDef.header;
-
-    // Default header style
     const defaultHeaderStyle: CellStyle = {
       font: { bold: true, name: 'Calibri', size: 11 },
       alignment: { vertical: 'middle', horizontal: 'center', wrapText: true },
-      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } }, // Light grey
+      fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } },
       border: {
-        top: { style: 'thin' }, left: { style: 'thin' },
-        bottom: { style: 'thin' }, right: { style: 'thin' }
+        style: 'thin'
       }
     };
     applyCellStyle(cell, defaultHeaderStyle);
-    // Apply column-specific header style
     if (colDef.headerStyle) {
       applyCellStyle(cell, colDef.headerStyle);
     }
@@ -142,28 +113,20 @@ function buildAndMergeHeadersForSheet(
       const numberOfLeafChildren = flattenColumns(colDef.children).length;
       if (numberOfLeafChildren > 1) {
         worksheet.mergeCells(
-          headerActualRow,
-          currentExcelColIdx,
-          headerActualRow,
-          currentExcelColIdx + numberOfLeafChildren - 1
+          headerActualRow, currentExcelColIdx,
+          headerActualRow, currentExcelColIdx + numberOfLeafChildren - 1
         );
       }
       buildAndMergeHeadersForSheet(
-        worksheet,
-        colDef.children,
-        currentRecursiveDepth + 1,
-        baseHeaderRowIndex,
-        currentExcelColIdx,
-        totalActualHeaderRows
+        worksheet, colDef.children, currentRecursiveDepth + 1,
+        baseHeaderRowIndex, currentExcelColIdx, totalActualHeaderRows
       );
       currentExcelColIdx += numberOfLeafChildren;
     } else {
       if (currentRecursiveDepth < totalActualHeaderRows - 1) {
         worksheet.mergeCells(
-          headerActualRow,
-          currentExcelColIdx,
-          baseHeaderRowIndex + totalActualHeaderRows - 1,
-          currentExcelColIdx
+          headerActualRow, currentExcelColIdx,
+          baseHeaderRowIndex + totalActualHeaderRows - 1, currentExcelColIdx
         );
       }
       currentExcelColIdx++;
@@ -172,11 +135,8 @@ function buildAndMergeHeadersForSheet(
   return currentExcelColIdx;
 }
 
-// --- EXPORT FUNCTIONS ---
 
-/**
- * Exports data to an Excel (.xlsx) file, supporting multiple sheets and advanced styling.
- */
+// --- EXPORT FUNCTIONS ---
 export const exportToExcel = async (
   sheetConfigs: SheetConfig[],
   fileName: string = 'exported_data'
@@ -187,7 +147,7 @@ export const exportToExcel = async (
   }
 
   const workbook: Workbook = new ExcelJS.Workbook();
-  workbook.creator = 'YourApplication'; // Optional: Set application name
+  workbook.creator = 'YourApplication';
   workbook.created = new Date();
   workbook.modified = new Date();
 
@@ -201,28 +161,25 @@ export const exportToExcel = async (
       ];
     }
     if (showGridLines === false) {
-      worksheet.properties.showGridLines = false;
+        worksheet.properties.showGridLines = false;
     }
-
 
     const isGrouped = columns.some(col => col.children && col.children.length > 0);
     const finalFlatColumns = flattenColumns(columns);
     let headerRowCount = 1;
 
-    // Define worksheet columns based on flattened structure for data mapping and initial width
     worksheet.columns = finalFlatColumns.map(col => ({
       key: col.key,
-      width: col.width, // Explicit width if provided, otherwise auto-calculated later
-      hidden: col.hidden === true, // Apply hidden status
+      width: col.width,
+      hidden: col.hidden === true,
     }));
 
-    // Build headers
     if (isGrouped) {
-      currentMaxHeaderDepth = 0; // Reset for current sheet
+      currentMaxHeaderDepth = 0;
       calculateSheetMaxHeaderDepth(columns, 0);
       headerRowCount = currentMaxHeaderDepth + 1;
       buildAndMergeHeadersForSheet(worksheet, columns, 0, 1, 1, headerRowCount);
-    } else { // Single header row
+    } else {
       const headerRow = worksheet.getRow(1);
       columns.forEach((col, index) => {
         const cell = headerRow.getCell(index + 1);
@@ -231,44 +188,36 @@ export const exportToExcel = async (
           font: { bold: true, name: 'Calibri', size: 11 },
           alignment: { vertical: 'middle', horizontal: 'center', wrapText: true },
           fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD9D9D9' } },
-          border: {
-            top: { style: 'thin' }, left: { style: 'thin' },
-            bottom: { style: 'thin' }, right: { style: 'thin' }
-          }
+          border: { style: 'thin' }
         };
         applyCellStyle(cell, defaultHeaderStyle);
-        if (col.headerStyle) {
-          applyCellStyle(cell, col.headerStyle);
-        }
+        if (col.headerStyle) applyCellStyle(cell, col.headerStyle);
       });
       if (headerRow.values.length === 0 && columns.length > 0) {
-        headerRow.values = columns.map(c => c.header);
+         headerRow.values = columns.map(c => c.header);
       }
       headerRow.commit();
     }
 
-    // Add data rows and apply styles
-    data.forEach((rowData) => {
-      const row = worksheet.addRow(rowData); // Uses keys from worksheet.columns
-      finalFlatColumns.forEach((colDef, colIndex) => {
-        const cell = row.getCell(colIndex + 1);
+    // Add data rows and apply styles - including image handling
+    for (let i = 0; i < data.length; i++) {
+      const rowData = data[i];
+      const row = worksheet.addRow(rowData); // Add data first
+
+      for (let j = 0; j < finalFlatColumns.length; j++) {
+        const colDef = finalFlatColumns[j];
+        const cell = row.getCell(j + 1); // 1-based index
         let cellValue = rowData[colDef.key];
 
-        // Default data cell style
+        // Apply default styles first
         const defaultDataStyle: CellStyle = {
           alignment: { horizontal: colDef.alignment || 'left', vertical: 'top', wrapText: true },
           font: { name: 'Calibri', size: 10 },
-          // No default fill or border for data cells, can be added if needed
         };
         applyCellStyle(cell, defaultDataStyle);
-
-        // Apply numFmt from simple 'format' or from dataStyle
-        if (colDef.format && (!colDef.dataStyle || (typeof colDef.dataStyle === 'object' && !colDef.dataStyle.numFmt))) {
-          cell.numFmt = colDef.format;
+         if (colDef.format && (!colDef.dataStyle || (typeof colDef.dataStyle !== 'function' && !colDef.dataStyle.numFmt))) {
+            cell.numFmt = colDef.format;
         }
-
-
-        // Apply column-specific data style (object or function)
         if (colDef.dataStyle) {
           const styleToApply = typeof colDef.dataStyle === 'function'
             ? colDef.dataStyle(cellValue, rowData, cell)
@@ -276,72 +225,135 @@ export const exportToExcel = async (
           applyCellStyle(cell, styleToApply);
         }
 
-        // Handle Hyperlinks
-        if (colDef.isHyperlink && cellValue != null) {
+        if (colDef.isImage && cellValue && typeof cellValue === 'string' && colDef.imageOptions) {
+          try {
+            const response = await fetch(cellValue);
+            if (!response.ok) throw new Error(`Failed to fetch image: ${response.statusText} (URL: ${cellValue})`);
+            const imageBuffer = await response.arrayBuffer();
+            
+            let extension = 'png'; // Default extension
+            const urlParts = cellValue.split('.');
+            const extFromUrl = urlParts[urlParts.length - 1].toLowerCase();
+            if (['png', 'jpeg', 'jpg', 'gif'].includes(extFromUrl)) {
+                extension = extFromUrl === 'jpg' ? 'jpeg' : extFromUrl;
+            }
+
+            const imageId = workbook.addImage({
+              buffer: imageBuffer,
+              extension: extension as 'png' | 'jpeg' | 'gif',
+            });
+
+            // Position and size the image
+            const imgPos: ImagePosition = {
+              tl: { col: j, row: row.number - 1 }, // 0-indexed col and row for image anchor
+              ext: { 
+                width: colDef.imageOptions.width, 
+                height: colDef.imageOptions.height 
+              }
+            };
+            if(colDef.imageOptions.hyperlink) {
+                (imgPos as any).hyperlinks = { // ExcelJS type might not show this, but it works
+                    hyperlink: colDef.imageOptions.hyperlink,
+                    tooltip: colDef.imageOptions.altText || colDef.imageOptions.hyperlink
+                }
+            }
+            worksheet.addImage(imageId, imgPos);
+            
+            cell.value = colDef.imageOptions.altText || null; // Set alt text or clear cell
+
+            // Adjust row height to fit the image (approximate)
+            const imageHeightInPoints = colDef.imageOptions.height * 0.75;
+            if (!row.height || row.height < imageHeightInPoints) {
+              row.height = imageHeightInPoints;
+            }
+          } catch (imgError) {
+            console.error(`Error loading image ${cellValue}:`, imgError);
+            cell.value = colDef.imageOptions?.altText || 'Error: Img Load';
+            applyCellStyle(cell, {font: {color: {argb: 'FFFF0000'}}}); // Style error text
+          }
+        } else if (colDef.isHyperlink && cellValue != null) {
           if (typeof cellValue === 'string') {
             cell.value = { text: cellValue, hyperlink: cellValue };
-            // Apply default hyperlink font style if not overridden
-            if (!cell.font || (!cell.font.color && !cell.font.underline)) {
-              cell.font = { ...cell.font, color: { argb: 'FF0000FF' }, underline: true };
-            }
           } else if (typeof cellValue === 'object' && cellValue.text && cellValue.hyperlink) {
             cell.value = { text: cellValue.text, hyperlink: cellValue.hyperlink, tooltip: cellValue.tooltip };
-            if (!cell.font || (!cell.font.color && !cell.font.underline)) {
-              cell.font = { ...cell.font, color: { argb: 'FF0000FF' }, underline: true };
-            }
+          }
+          // Apply default hyperlink font style if not overridden by dataStyle
+          if (!cell.font || (!cell.font.color && !cell.font.underline)) {
+            cell.font = { ...cell.font, color: { argb: 'FF0000FF' }, underline: true };
           }
         } else {
-          cell.value = cellValue; // Ensure value is set if not hyperlink
+          // For non-image, non-hyperlink cells, ensure the value is set if not already by addRow
+           if(cell.value === undefined || cell.value === null ) cell.value = cellValue;
         }
-      });
-    });
-
-    // Auto-fit column widths (if not explicitly set and not hidden)
+      }
+    }
+    
+    // Auto-fit column widths
     worksheet.columns.forEach((excelColumn, index) => {
       const colDef = finalFlatColumns[index];
       if (excelColumn.hidden || (colDef && typeof colDef.width === 'number')) {
-        // If hidden or width is explicitly set, use that width (already set during worksheet.columns definition)
-        // or if hidden, ExcelJS handles it.
         return;
       }
-
       let maxColumnLength = 0;
-      // Header text length
       for (let i = 1; i <= headerRowCount; i++) {
         const headerCell = worksheet.getCell(i, index + 1);
         const headerText = headerCell.text || (headerCell.value ? String(headerCell.value) : '');
         maxColumnLength = Math.max(maxColumnLength, headerText.length);
       }
-      // Data cell content length
       for (let i = 0; i < data.length; i++) {
         const dataRowIndexOnSheet = headerRowCount + 1 + i;
         const cell = worksheet.getCell(dataRowIndexOnSheet, index + 1);
-        // For hyperlinks, measure text part
-        const valueToMeasure = (colDef.isHyperlink && cell.value && typeof cell.value === 'object' && (cell.value as any).text)
-          ? (cell.value as any).text
-          : (cell.value ? String(cell.value) : '');
+        let valueToMeasure = cell.value ? String(cell.value) : '';
+        if (colDef.isImage && colDef.imageOptions?.altText) {
+            valueToMeasure = colDef.imageOptions.altText; // Use alt text for image column width
+        } else if (colDef.isHyperlink && cell.value && typeof cell.value === 'object' && (cell.value as any).text) {
+           valueToMeasure = (cell.value as any).text;
+        }
         maxColumnLength = Math.max(maxColumnLength, valueToMeasure.length);
       }
-      excelColumn.width = maxColumnLength < 10 ? 10 : maxColumnLength + 5; // Padding
+      excelColumn.width = maxColumnLength < 10 ? 10 : maxColumnLength + 5;
     });
-
-  } // End of loop for sheetConfigs
+  }
 
   const buffer = await workbook.xlsx.writeBuffer();
   saveAs(
-    new Blob([buffer], {
-      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-    }),
+    new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }), 
     `${fileName}.xlsx`
   );
 };
 
+// --- CSV Export (images will be represented by URL or alt text) ---
+const formatValueForCSV = (value: any, colDef: ColumnDefinition): string => {
+  let outputValue = '';
+  if (value == null) {
+    outputValue = '';
+  } else if (colDef.isImage) {
+    // For CSV, use alt text if available, otherwise the URL (original value)
+    outputValue = colDef.imageOptions?.altText || (typeof value === 'string' ? value : '[Image]');
+  } else if (colDef.isHyperlink) {
+    if (typeof value === 'object' && value.text) {
+      outputValue = value.text; // Use display text for hyperlinks in CSV
+    } else {
+      outputValue = String(value);
+    }
+  } else {
+    // Use the existing formatValue logic for other types
+    // but pass the specific format string from column definition
+    return formatValue(value, colDef.format || (colDef.dataStyle && typeof colDef.dataStyle !== 'function' ? colDef.dataStyle.numFmt : undefined));
+  }
 
-// --- CSV Export (largely unchanged, operates on first sheet) ---
+  // General CSV value escaping
+  if (outputValue.includes(',') || outputValue.includes('"') || outputValue.includes('\n')) {
+    outputValue = `"${outputValue.replace(/"/g, '""')}"`;
+  }
+  return outputValue;
+};
+
+// Original formatValue for non-CSV specific formatting (used by formatValueForCSV)
 const formatValue = (value: any, format?: string): string => {
   if (value == null || value === '') return '';
   if (format) {
-    if (format.includes('#,##0')) { // Basic number/currency
+    if (format.includes('#,##0')) {
       const num = Number(value);
       if (!isNaN(num)) {
         const hasDecimals = format.includes('.00');
@@ -353,30 +365,29 @@ const formatValue = (value: any, format?: string): string => {
         }).format(num);
         return `${currencySymbol}${formatted}`;
       }
-    } else if (format.toLowerCase() === 'yyyy-mm-dd' || format.toLowerCase() === 'yyyy/mm/dd') { // Date
+    } else if (format.toLowerCase() === 'yyyy-mm-dd' || format.toLowerCase() === 'yyyy/mm/dd' || format.includes('年') ) {
       const date = new Date(value);
       if (!isNaN(date.getTime())) {
         const year = date.getFullYear();
         const month = (date.getMonth() + 1).toString().padStart(2, '0');
         const day = date.getDate().toString().padStart(2, '0');
-        return format.toLowerCase() === 'yyyy/mm/dd' ? `${year}/${month}/${day}` : `${year}-${month}-${day}`;
+        if (format.toLowerCase() === 'yyyy/mm/dd') return `${year}/${month}/${day}`;
+        if (format.includes('年')) return `${year}年${month}月${day}日`; // Example for Chinese date format
+        return `${year}-${month}-${day}`;
       }
-    } else if (format.endsWith('%')) { // Percentage
-      const num = Number(value);
-      if (!isNaN(num)) {
-        const precision = (format.match(/\.(\d+)%$/) || [])[1]?.length || 0;
-        return (num * 100).toFixed(precision) + '%';
-      }
+    } else if (format.endsWith('%')) {
+        const num = Number(value);
+        if(!isNaN(num)){
+            const precision = (format.match(/\.(\d+)%$/) || [])[1]?.length || 0;
+            return (num * 100).toFixed(precision) + '%';
+        }
     }
   }
-  // General CSV value escaping
-  let stringValue = String(value);
-  if (stringValue.includes(',') || stringValue.includes('"') || stringValue.includes('\n')) {
-    stringValue = `"${stringValue.replace(/"/g, '""')}"`;
-  }
-  return stringValue;
+  return String(value); // Return raw string if no specific format matches
 };
 
+
+// getCsvHeaderRows and calculateCsvMaxHeaderDepth remain the same
 let csvMaxHeaderDepth = 0;
 function calculateCsvMaxHeaderDepth(cols: ColumnDefinition[], currentDepth: number) {
   csvMaxHeaderDepth = Math.max(csvMaxHeaderDepth, currentDepth);
@@ -388,40 +399,40 @@ function calculateCsvMaxHeaderDepth(cols: ColumnDefinition[], currentDepth: numb
 }
 
 const getCsvHeaderRows = (columns: ColumnDefinition[]): string[][] => {
-  const finalFlatCols = flattenColumns(columns);
-  const numLeafColumns = finalFlatCols.length;
-  csvMaxHeaderDepth = 0;
-  calculateCsvMaxHeaderDepth(columns, 0);
-  const totalHeaderLevels = csvMaxHeaderDepth + 1;
-  const headerRowsOutput: string[][] = Array.from({ length: totalHeaderLevels }, () =>
-    new Array(numLeafColumns).fill('')
-  );
-  function populateHeadersRecursive(
-    colsToProcess: ColumnDefinition[],
-    currentDepth: number,
-    currentCsvColStartIdx: number
-  ): number {
-    let cumulativeLeafCount = 0;
-    colsToProcess.forEach(colDef => {
-      const cellValue = `"${colDef.header.replace(/"/g, '""')}"`;
-      if (colDef.children && colDef.children.length > 0) {
-        const childLeafCount = flattenColumns(colDef.children).length;
-        if (childLeafCount > 0) {
-          headerRowsOutput[currentDepth][currentCsvColStartIdx + cumulativeLeafCount] = cellValue;
-        }
-        populateHeadersRecursive(colDef.children, currentDepth + 1, currentCsvColStartIdx + cumulativeLeafCount);
-        cumulativeLeafCount += childLeafCount;
-      } else {
-        for (let d = currentDepth; d < totalHeaderLevels; d++) {
-          headerRowsOutput[d][currentCsvColStartIdx + cumulativeLeafCount] = cellValue;
-        }
-        cumulativeLeafCount++;
-      }
-    });
-    return cumulativeLeafCount;
-  }
-  populateHeadersRecursive(columns, 0, 0);
-  return headerRowsOutput;
+    const finalFlatCols = flattenColumns(columns);
+    const numLeafColumns = finalFlatCols.length;
+    csvMaxHeaderDepth = 0; 
+    calculateCsvMaxHeaderDepth(columns, 0);
+    const totalHeaderLevels = csvMaxHeaderDepth + 1;
+    const headerRowsOutput: string[][] = Array.from({ length: totalHeaderLevels }, () => 
+        new Array(numLeafColumns).fill('')
+    );
+    function populateHeadersRecursive(
+        colsToProcess: ColumnDefinition[], 
+        currentDepth: number, 
+        currentCsvColStartIdx: number
+    ): number {
+        let cumulativeLeafCount = 0;
+        colsToProcess.forEach(colDef => {
+            const cellValue = `"${colDef.header.replace(/"/g, '""')}"`;
+            if (colDef.children && colDef.children.length > 0) {
+                const childLeafCount = flattenColumns(colDef.children).length;
+                if (childLeafCount > 0) {
+                    headerRowsOutput[currentDepth][currentCsvColStartIdx + cumulativeLeafCount] = cellValue;
+                }
+                populateHeadersRecursive(colDef.children, currentDepth + 1, currentCsvColStartIdx + cumulativeLeafCount);
+                cumulativeLeafCount += childLeafCount;
+            } else {
+                for (let d = currentDepth; d < totalHeaderLevels; d++) {
+                    headerRowsOutput[d][currentCsvColStartIdx + cumulativeLeafCount] = cellValue;
+                }
+                cumulativeLeafCount++;
+            }
+        });
+        return cumulativeLeafCount;
+    }
+    populateHeadersRecursive(columns, 0, 0);
+    return headerRowsOutput;
 };
 
 export const exportToCSV = (
@@ -429,8 +440,8 @@ export const exportToCSV = (
   fileName: string
 ): void => {
   const { data, columns } = sheetConfig;
-  const flatDataColumns = flattenColumns(columns.filter(c => !c.hidden)); // Filter hidden columns for CSV
-  const visibleColumns = columns.filter(c => !c.hidden); // Use only visible columns for header generation
+  const visibleColumns = columns.filter(c => !c.hidden);
+  const flatDataColumns = flattenColumns(visibleColumns); 
 
   const isGrouped = visibleColumns.some(col => col.children && col.children.length > 0);
   let csvHeaderString: string;
@@ -443,14 +454,9 @@ export const exportToCSV = (
   }
 
   const dataRows = data.map(item =>
-    flatDataColumns.map((col) => { // flatDataColumns already filtered hidden ones
-      const rawValue = item[col.key];
-      // For CSV, hyperlinks are just text. If it's an object, take the text part or hyperlink.
-      let valueToFormat = rawValue;
-      if (col.isHyperlink && typeof rawValue === 'object' && rawValue !== null) {
-        valueToFormat = rawValue.text || rawValue.hyperlink || '';
-      }
-      return formatValue(valueToFormat, col.format || (col.dataStyle && typeof col.dataStyle !== 'function' ? col.dataStyle.numFmt : undefined));
+    flatDataColumns.map((colDef) => {
+      const rawValue = item[colDef.key];
+      return formatValueForCSV(rawValue, colDef); // Use the new CSV-specific formatter
     }).join(',')
   );
 
@@ -460,9 +466,7 @@ export const exportToCSV = (
   saveAs(blob, `${fileName}.csv`);
 };
 
-/**
- * Main export function. Handles multiple sheets for XLSX and the first sheet for CSV.
- */
+
 export const exportData = async (
   sheetConfigs: SheetConfig[],
   fileName: string = 'exported_data',
@@ -472,7 +476,6 @@ export const exportData = async (
     console.error("No sheet data provided for export.");
     return;
   }
-
   if (format === 'csv') {
     if (sheetConfigs.length > 1) {
       console.warn("CSV export does not support multiple sheets. Exporting the first sheet only: " + sheetConfigs[0].sheetName);
