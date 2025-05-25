@@ -44,7 +44,7 @@ var FileCard = exports.FileCard = function FileCard(props) {
     className: "FileCard-name"
   }, name), /*#__PURE__*/_react.default.createElement("div", {
     className: "FileCard-meta"
-  }, size != null && /*#__PURE__*/_react.default.createElement("span", {
+  }, size != null && size > 0 && /*#__PURE__*/_react.default.createElement("span", {
     className: "FileCard-size"
-  }, (0, _prettyBytes.default)(size)), children))));
+  }, size > 0 ? (0, _prettyBytes.default)(size) : ''), children))));
 };

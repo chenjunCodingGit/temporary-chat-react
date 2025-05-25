@@ -41,7 +41,7 @@ export const FileCard: React.FC<FileCardProps> = (props) => {
             )
           }
           <div className="FileCard-meta">
-            {size != null && <span className="FileCard-size">{prettyBytes(size)}</span>}
+            {(size != null && size > 0) && <span className="FileCard-size">{size > 0 ? prettyBytes(size) : ''}</span>}
             {children}
           </div>
         </FlexItem>
