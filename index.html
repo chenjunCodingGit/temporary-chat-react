@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Static Site with Chatbot</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            margin: 0;
+            padding: 20px;
+            min-height: 150vh; /* 为了演示滚动和浮动按钮 */
+            background-color: #f0f0f0;
+        }
+        .header {
+            background-color: #333;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .content {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+        }
+
+        /* 浮动播放按钮样式 */
+        .float-play-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 60px; /* 根据你的图片调整 */
+            height: 60px; /* 根据你的图片调整 */
+            cursor: pointer;
+            z-index: 1000;
+            border-radius: 50%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            transition: transform 0.2s ease-in-out;
+        }
+        .float-play-btn:hover {
+            transform: scale(1.1);
+        }
+
+        /* 聊天对话框容器样式 */
+        #chat-dialog-container {
+            position: fixed;
+            bottom: 100px; /* 按钮上方 */
+            right: 30px;
+            width: 350px; /* 根据 ChatDialog 的设计调整 */
+            height: 500px; /* 根据 ChatDialog 的设计调整 */
+            /* background-color: white; */ /* ChatDialog 应该有自己的背景 */
+            box-shadow: 0 0 15px rgba(0,0,0,0.2);
+            border-radius: 8px;
+            z-index: 999;
+            display: none; /* 初始隐藏 */
+            overflow: hidden; /* 如果 ChatDialog 内容可能溢出 */
+        }
+    </style>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js" crossorigin></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js" crossorigin></script>
+    <script src="http://localhost:3001/lib/chatui_icons_2.6.2.js" crossorigin></script>
+    <script>window.global = {};</script>
+    <script>var exports = {};</script> <!-- Fix for "Uncaught ReferenceError: exports is not defined" -->
+    <script src="http://localhost:3001/lib/lib.js" type="module"></script>
+
+    <link rel="stylesheet" href="http://localhost:3001/my-react-vite.css">
+</head>
+<body>
+    <div class="header">
+        <h1>Welcome to Our Static Site</h1>
+    </div>
+
+    <div class="content">
+        <p>This is the main content of the static HTML page.</p>
+        <p>Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat.</p>
+        <p>Scroll down to see the floating chat button.</p>
+    </div>
+
+    <img class="float-play-btn" id="chat-toggle-btn" src="./assets/ai-chat.svg" alt="AI Chatbot">
+
+    <div id="chat-dialog-container"></div>
+
+    <script src="http://localhost:3001/chat-dialog-lib.umd.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const chatToggleBtn = document.getElementById('chat-toggle-btn');
+            const chatDialogContainer = document.getElementById('chat-dialog-container');
+            let isChatOpen = false;
+
+            chatToggleBtn.addEventListener('click', () => {
+                if (isChatOpen) {
+                    // 关闭聊天窗口
+                    if (window.unmountChatDialog) {
+                         window.unmountChatDialog('chat-dialog-container');
+                    }
+                    chatDialogContainer.style.display = 'none';
+                    isChatOpen = false;
+                } else {
+                    // 打开聊天窗口
+                    chatDialogContainer.style.display = 'block';
+                    if (window.renderChatDialog) {
+                        const chatProps = {
+                            isOpen: true,
+                            onClose: () => {
+                                chatDialogContainer.style.display = 'none';
+                                isChatOpen = false;
+                            },
+                        };
+                        window.renderChatDialog('chat-dialog-container', chatProps);
+                    } else {
+                        console.error('renderChatDialog function is not available.');
+                    }
+                    isChatOpen = true;
+                }
+            });
+        });
+    </script>
+</body>
+</html>
