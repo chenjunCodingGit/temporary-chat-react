@@ -31,3 +31,5 @@ dist-ssr
 # 本地敏感配置（永远忽略）
 .env.local
 .env.*.local
+dist
+dist-lib

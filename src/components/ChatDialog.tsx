@@ -66,7 +66,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
     if (isOpen) {
       setChatDialogClass(styles.open);
     } else {
-      setChatDialogClass('');
+      setChatDialogClass(styles.open);
     }
   }, [isOpen]);
 
@@ -183,7 +183,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
   }
 
   return (
-    <div className={`${styles.chatDialogWrapper} ${chatDialogClass}`}>
+    <div  className={`${styles.chatDialogWrapper} ${chatDialogClass}`}>
       <div className={styles.chatDialog}>
         <button className={styles.closeBtn} onClick={onClose}>
           X

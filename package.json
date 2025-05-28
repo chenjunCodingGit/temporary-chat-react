@@ -5,7 +5,9 @@
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "tsc -b && vite build --ignore-warnings eslint",
+    "build": "tsc -b && vite build",
+    "build:lib": "tsc && vite build --config vite.config.ts",
+    "start:chat-app-server": "node chat-app-server.js",
     "lint": "eslint .",
     "preview": "vite preview"
   },
@@ -13,7 +15,9 @@
     "@chatui/core": "^3.0.0",
     "clsx": "^1.1.1",
     "core-js": "^3.31.0",
+    "cors": "^2.8.5",
     "dompurify": "^3.2.5",
+    "express": "^5.1.0",
     "intersection-observer": "^0.12.2",
     "marked": "^15.0.8",
     "react": "^18.3.1",
@@ -22,6 +26,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.22.0",
+    "@types/node": "^22.15.23",
     "@types/react": "^19.0.10",
     "@types/react-dom": "^19.0.4",
     "@vitejs/plugin-react": "^4.3.4",
