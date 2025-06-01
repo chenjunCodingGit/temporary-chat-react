@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
 // import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton, RateActions } from '../lib/chatui/core/es/index';
-import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton, RateActions } from '../lib/src/index';
+import Chat, { Icon, IconButton, Bubble, useMessages, MessageStatus, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton, RateActions } from '../lib/src/index';
 import chatbotAvatarSVG from '../assets/chatbot-avatar.svg';
 import styles from '../styles/ChatDialog.module.css';
 
@@ -129,7 +129,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
     handleSend('text', item.name);
   }
 
-  function renderMessageContent(msg: { type: any; content?: any; position?: string; }) {
+  function renderMessageContent(msg: { type: any; content?: any; position?: string; status?: string; }) {
     console.log('msg', msg);
     const { type, content } = msg;
 
@@ -138,6 +138,10 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
       case 'text':
         return content?.text ? (
           <div style={{ display: 'flex' }}>
+            {
+              (msg.position === 'right' && msg.status !== 'fail') ?
+                (<MessageStatus status="fail" />) : null
+            }
             <Bubble
               style={{ textAlign: 'left' }}
               content={content.text} />{
@@ -153,7 +157,6 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
                 </div>
                 : null
             }
-
           </div>
         )
           : null;
@@ -183,7 +186,7 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
   }
 
   return (
-    <div  className={`${styles.chatDialogWrapper} ${chatDialogClass}`}>
+    <div className={`${styles.chatDialogWrapper} ${chatDialogClass}`}>
       <div className={styles.chatDialog}>
         <button className={styles.closeBtn} onClick={onClose}>
           X

@@ -24,9 +24,9 @@ export const MessageStatus = ({
   onChange,
 }: MessageStatusProps) => {
   const [type, setType] = useState<StatusType>('');
-  const loadingTimerRef = useRef<ReturnType<typeof setTimeout>>();
-  const failTimerRef = useRef<ReturnType<typeof setTimeout>>();
-  const autoTimerRef = useRef<ReturnType<typeof setTimeout>>();
+  const loadingTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const failTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const autoTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
 
   function clear() {
     if (loadingTimerRef.current) {
