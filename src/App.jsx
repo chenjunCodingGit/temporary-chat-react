@@ -1,13 +1,166 @@
 // src/App.jsx
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+// import * as XLSX from 'xlsx';
+// import ExcelJS from 'exceljs/dist/es5/exceljs.browser.min.js';
+import ExcelJS from 'exceljs';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
 import './App.css';
 // 确保从正确路径导入，并且 Export2Excel.ts 导出了这些类型
 import { exportData, } from './Export2Excel';
+import { exportExcel } from './Append2Excel';
+import templateBase64 from './excelTemplateBase64';
+import ExcelExportButton from './components/ExcelExportButton';
 
 function App() {
   const [count, setCount] = useState(0);
+  const [templateBuffer, setTemplateBuffer] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  const [thirdSheetData] = useState({
+    sheetName: 'Table2',
+    data: [
+      { 姓名: '张三', 年龄: 28, 入职日期: new Date('2023-01-15') },
+      { 姓名: '李四', 年龄: 32, 入职日期: new Date('2022-05-20') },
+      // 更多数据...
+    ]
+  });
+
+  const [fourthSheetData] = useState({
+    sheetName: 'Table1',
+    data: [
+      { 产品: '电脑', 数量: 100, 单价: 5000, 总价: '=C2*D2' },
+      { 产品: '手机', 数量: 200, 单价: 3000, 总价: '=C3*D3' },
+      // 更多数据...
+    ]
+  });
+
+
+  // 从服务器获取Excel模板
+  useEffect(() => {
+    const fetchTemplate = async () => {
+      try {
+        const response = await fetch('/Book1.xlsx');
+        const arrayBuffer = await response.arrayBuffer();
+        setTemplateBuffer(arrayBuffer);
+        setLoading(false);
+      } catch (error) {
+        console.error('获取模板失败:', error);
+        setLoading(false);
+      }
+    };
+
+    fetchTemplate();
+  }, []);
+
+  // 导出Excel文件
+  const exportExcel = async () => {
+    if (!templateBuffer) return;
+
+    try {
+      // 创建工作簿并加载模板
+      const workbook = new ExcelJS.Workbook();
+      await workbook.xlsx.load(templateBuffer);
+
+      // 准备第三和第四个sheet的数据
+      const sheet3Data = [
+        { colA: 'Value1', colB: '=VLOOKUP(A2,Sheet1!$A$1:$B$100,2,FALSE)', colC: 'Data1', colD: 'Info1' },
+        { colA: 'Value2', colB: '=VLOOKUP(A3,Sheet1!$A$1:$B$100,2,FALSE)', colC: 'Data2', colD: 'Info2' },
+      ];
+
+      const sheet4Data = [
+        { colA: 'Item1', colB: 'Detail1', colC: 'Category1' },
+        { colA: 'Item2', colB: 'Detail2', colC: 'Category2' },
+      ];
+
+      // 获取第三个sheet并追加数据
+      const sheet3 = workbook.getWorksheet(3);
+      if (sheet3) {
+        // 获取最后一行的行号
+        const lastRowNum = sheet3.lastRow?.number || 0;
+
+        // 遍历数据，逐行追加
+        sheet3Data.forEach((rowData, index) => {
+          const targetRowNum = lastRowNum + index + 1;
+
+          // 遍历对象的每个属性，写入对应列
+          Object.keys(rowData).forEach((key, colIndex) => {
+            // 将列索引转换为Excel列字母 (A, B, C, ...)
+            const columnLetter = String.fromCharCode(65 + colIndex);
+            const cellAddress = `${columnLetter}${targetRowNum}`;
+
+            // 设置单元格值
+            sheet3.getCell(cellAddress).value = rowData[key];
+
+            // 复制上一行对应列的格式（保留原有格式）
+            if (lastRowNum > 0) {
+              const sourceCell = sheet3.getCell(`${columnLetter}${lastRowNum}`);
+              const targetCell = sheet3.getCell(cellAddress);
+
+              // 复制所有格式属性
+              targetCell.font = { ...sourceCell.font };
+              targetCell.alignment = { ...sourceCell.alignment };
+              targetCell.border = { ...sourceCell.border };
+              targetCell.fill = { ...sourceCell.fill };
+              targetCell.numFmt = sourceCell.numFmt;
+            }
+          });
+        });
+      }
+
+      // 获取第四个sheet并追加数据
+      const sheet4 = workbook.getWorksheet(4);
+      if (sheet4) {
+        const lastRowNum = sheet4.lastRow?.number || 0;
+
+        sheet4Data.forEach((rowData, index) => {
+          const targetRowNum = lastRowNum + index + 1;
+
+          Object.keys(rowData).forEach((key, colIndex) => {
+            const columnLetter = String.fromCharCode(65 + colIndex);
+            const cellAddress = `${columnLetter}${targetRowNum}`;
+
+            sheet4.getCell(cellAddress).value = rowData[key];
+
+            // 复制格式
+            if (lastRowNum > 0) {
+              const sourceCell = sheet4.getCell(`${columnLetter}${lastRowNum}`);
+              const targetCell = sheet4.getCell(cellAddress);
+
+              targetCell.font = { ...sourceCell.font };
+              targetCell.alignment = { ...sourceCell.alignment };
+              targetCell.border = { ...sourceCell.border };
+              targetCell.fill = { ...sourceCell.fill };
+              targetCell.numFmt = sourceCell.numFmt;
+            }
+          });
+        });
+      }
+
+      // 设置必要的元数据
+      workbook.creator = 'ExcelJS';
+      workbook.lastModifiedBy = 'User';
+      workbook.created = new Date();
+      workbook.modified = new Date();
+
+      // 保存工作簿为新的Excel文件
+      const uint8Array = new Uint8Array(await workbook.xlsx.writeBuffer());
+      const blob = new Blob([uint8Array], { type: 'application/octet-stream' });
+
+      // 创建下载链接
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'exported_data.xlsx';
+      document.body.appendChild(a);
+      a.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true, view: window }));
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error('导出Excel失败:', error);
+      alert('导出Excel失败，请重试');
+    }
+  };
 
   // --- Demo Data and Column Definitions ---
 
@@ -208,6 +361,26 @@ function App() {
     // exportData([sheet1Config, sheet2Config], 'Enterprise_Data_Report_Products_CSV', 'csv');
   };
 
+  const handleExport = async () => {
+    // 示例数据
+    const dataSheet3 = [
+      ['Key1'],
+      ['Key2'],
+      ['Key3']
+    ];
+
+    const dataSheet4 = [
+      ['Name1', 123, 'Info1'],
+      ['Name2', 456, 'Info2']
+    ];
+
+    try {
+      await exportExcel(templateBase64, dataSheet3, dataSheet4);
+      console.log('Excel 导出成功');
+    } catch (err) {
+      console.error('导出失败', err);
+    }
+  };
 
   return (
     <>
@@ -219,7 +392,28 @@ function App() {
           <img src={reactLogo} className="logo react" alt="React logo" />
         </a>
       </div>
+      <h1 className="text-2xl font-bold mb-6">Excel导出示例</h1>
+      <div className="bg-white rounded-lg shadow-md p-6 mb-6">
+        <ExcelExportButton
+          thirdSheetData={thirdSheetData}
+          fourthSheetData={fourthSheetData}
+        />
+      </div>
+      <div className="bg-gray-100 rounded-lg p-4">
+        <p className="text-gray-700">说明：点击按钮将基于模板生成Excel文件，</p>
+        <p className="text-gray-700">第三个和第四个工作表将包含动态添加的数据。</p>
+      </div>
+      <button
+        disabled={loading}
+        onClick={exportExcel}
+        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+      >
+        {loading ? '加载模板中...' : 'Excel'}
+      </button>
       <h1>Vite + React Advanced Excel Export</h1>
+      <button onClick={handleExport} style={{ padding: '10px 20px', fontSize: '16px' }}>
+        Export 2 Append Excel
+      </button>
       <div className="card">
         <button onClick={() => setCount((c) => c + 1)}>
           Counter is {count}
