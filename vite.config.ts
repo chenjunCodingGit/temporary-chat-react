@@ -8,6 +8,16 @@ export default defineConfig({
     'process.env.NODE_ENV': JSON.stringify('production')
   },
   plugins: [react()],
+  server: {
+    port: 3000,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:4000',
+        changeOrigin: true,
+        rewrite: (path) => path.replace(/^\/api/, ''),
+      },
+    },
+  },
   build: {
     // 将 ChatDialog 组件打包成库
     lib: {
