@@ -5,12 +5,16 @@ import React, { useState, useEffect } from 'react';
 import ExcelJS from 'exceljs';
 import reactLogo from './assets/react.svg';
 import viteLogo from '/vite.svg';
+import ExcelExportWithTables from './components/ExcelExportWithTables';
 import './App.css';
 // 确保从正确路径导入，并且 Export2Excel.ts 导出了这些类型
 import { exportData, } from './Export2Excel';
 import { exportExcel } from './Append2Excel';
 import templateBase64 from './excelTemplateBase64';
 import ExcelExportButton from './components/ExcelExportButton';
+import ExcelExportBtn from './components/ExcelExportBtn';
+import { ExcelGenerator } from './components/ExcelGenerator';
+import { NewExport } from './components/NewExport';
 
 function App() {
   const [count, setCount] = useState(0);
@@ -34,6 +38,28 @@ function App() {
       // 更多数据...
     ]
   });
+
+  // Sample data for the table in the 3rd sheet (Table2)
+  // Ensure keys match the exact column header names in your Excel template's Table2
+  const dataForSheet3Table = {
+    tableName: 'Table2', // This MUST match the table name in your Excel template's 3rd sheet
+    data: [
+      { '列 A': '新数据1A XLSX', '列 B': 1001, '列 C': new Date(2025, 6, 1) },
+      { '列 A': '新数据2A XLSX', '列 B': 2002, '列 C': new Date(2025, 6, 2) },
+      { '列 A': '新数据3A XLSX', '列 B': 3003, '列 C': new Date(2025, 6, 3) },
+    ],
+  };
+
+  // Sample data for the table in the 4th sheet (Table1)
+  // Ensure keys match the exact column header names in your Excel template's Table1
+  const dataForSheet4Table = {
+    tableName: 'Table1', // This MUST match the table name in your Excel template's 4th sheet
+    data: [
+      { '产品名称': '产品X-XLSX', '数量': 15, '单价': 55.00 },
+      { '产品名称': '产品Y-XLSX', '数量': 25, '单价': 80.50 },
+      { '产品名称': '产品Z-XLSX', '数量': 8, '单价': 125.00 },
+    ],
+  };
 
 
   // 从服务器获取Excel模板
@@ -384,15 +410,34 @@ function App() {
 
   return (
     <>
-      <div>
-        <a href="https://vite.dev" target="_blank" rel="noopener noreferrer">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank" rel="noopener noreferrer">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1 className="text-2xl font-bold mb-6">Excel导出示例</h1>
+    <NewExport/>
+      {/* <div className="bg-white shadow-lg rounded-lg p-6">
+        <ExcelGenerator
+          defaultFileName="销售数据报表"
+          defaultSheetName="销售明细"
+          initialData={{
+            headers: ['产品名称', '数量', '单价', '金额'],
+            rows: [
+              ['苹果', 100, 5.5, 550],
+              ['香蕉', 200, 3.2, 640],
+              ['橙子', 150, 4.8, 720],
+            ],
+          }}
+        />
+        <ExcelExportWithTables />
+        <p className="text-gray-700 mb-4">
+          点击按钮加载 <code>public/excel-template.xlsx</code>,
+          将数据追加到第三个工作表的 "Table2" 和第四个工作表的 "Table1"。
+          使用 SheetJS (xlsx) 库。
+        </p>
+        <ExcelExportBtn
+          sheet3Data={dataForSheet3Table}
+          sheet4Data={dataForSheet4Table}
+          templatePath="/excel-template.xlsx"
+          outputFileName="Appended_Report_XLSX"
+        />
+      </div> */}
+      {/* <h1 className="text-2xl font-bold mb-6">Excel导出示例</h1>
       <div className="bg-white rounded-lg shadow-md p-6 mb-6">
         <ExcelExportButton
           thirdSheetData={thirdSheetData}
@@ -409,7 +454,7 @@ function App() {
         className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
       >
         {loading ? '加载模板中...' : 'Excel'}
-      </button>
+      </button> */}
       <h1>Vite + React Advanced Excel Export</h1>
       <button onClick={handleExport} style={{ padding: '10px 20px', fontSize: '16px' }}>
         Export 2 Append Excel
