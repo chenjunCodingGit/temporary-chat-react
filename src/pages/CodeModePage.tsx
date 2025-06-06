@@ -1,9 +1,9 @@
 
-// src/pages/AboutPage.tsx
+// src/pages/CodeModePage.tsx
 import { useState, useEffect } from 'react';
 import { nanoid } from 'nanoid'; // For generating unique IDs
-import { jwtDecode } from "jwt-decode"; // To decode JWT token from Google
-import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
+import { jwtDecode } from 'jwt-decode';
+import { GoogleOAuthProvider, GoogleLogin, CredentialResponse, useGoogleLogin } from '@react-oauth/google';
 import Chat, { Bubble, useMessages, MessageProps } from '@chatui/core';
 import styles from '../App.module.css'; // Import CSS module
 
@@ -13,7 +13,7 @@ interface UserProfile {
   picture?: string;
 }
 
-const AboutPage = () => {
+const CodeModePage = () => {
   const { VITE_GOOGLE_CLIENT_ID } = import.meta.env;
   const googleClientId = VITE_GOOGLE_CLIENT_ID;
 
@@ -21,6 +21,8 @@ const AboutPage = () => {
   const [showChat, setShowChat] = useState(false);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+  const [user, setUser] = useState<any>(null);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     // Initial greeting message when chat becomes visible
@@ -120,76 +122,106 @@ const AboutPage = () => {
     }
   }
 
+  const onSuccess = async (response: any) => {
+    try {
+      // 获取授权码
+      const code = response;
+      console.log('授权码:', code);
+
+      // 在实际应用中，这里应该将授权码发送到后端
+      // 后端使用此代码交换访问令牌和刷新令牌
+
+      // 解码ID令牌以获取用户信息（演示目的）
+      const decoded = jwtDecode(response.credential);
+      setUser(decoded);
+    } catch (err: any) {
+      console.error('处理授权响应时出错:', err);
+      setError(err.message);
+    }
+  };
+
+  const onError = () => {
+    console.error('登录失败:');
+    setIsAuthenticated(false);
+    setUserProfile(null);
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md p-6">
-      <GoogleOAuthProvider clientId={googleClientId}>
-        <div className={styles.appContainer}>
-          <header className={styles.appHeader}>
-            <h1>我的聊天应用</h1>
-            {isAuthenticated && userProfile && (
-              <div className={styles.userInfo}>
-                {userProfile.picture && (
-                  <img src={userProfile.picture} alt={userProfile.name} className={styles.profilePic} />
-                )}
-                <span>欢迎, {userProfile.name} ({userProfile.email})</span>
-                <button
-                  onClick={() => {
-                    setIsAuthenticated(false);
-                    setUserProfile(null);
-                    setShowChat(false); // Hide chat on logout
-                    // Optionally, you can also use googleLogout() from @react-oauth/google
-                    // import { googleLogout } from '@react-oauth/google';
-                    // googleLogout();
-                    console.log("User logged out");
-                    // Clear messages or add a logout message
-                    // setMessages([]); // Example: clear messages
-                    appendMsg({
-                      type: 'text',
-                      content: { text: '您已退出登录。' },
-                      _id: nanoid(),
-                    });
-                  }}
-                  className={styles.logoutButton}
-                >
-                  退出登录
-                </button>
-              </div>
-            )}
-          </header>
+      <div className={styles.appContainer}>
+        <header className={styles.appHeader}>
+          <h1>我的聊天应用</h1>
+          {isAuthenticated && userProfile && (
+            <div className={styles.userInfo}>
+              {userProfile.picture && (
+                <img src={userProfile.picture} alt={userProfile.name} className={styles.profilePic} />
+              )}
+              <span>欢迎, {userProfile.name} ({userProfile.email})</span>
+              <button
+                onClick={() => {
+                  setIsAuthenticated(false);
+                  setUserProfile(null);
+                  setShowChat(false); // Hide chat on logout
+                  // Optionally, you can also use googleLogout() from @react-oauth/google
+                  // import { googleLogout } from '@react-oauth/google';
+                  // googleLogout();
+                  console.log("User logged out");
+                  // Clear messages or add a logout message
+                  // setMessages([]); // Example: clear messages
+                  appendMsg({
+                    type: 'text',
+                    content: { text: '您已退出登录。' },
+                    _id: nanoid(),
+                  });
+                }}
+                className={styles.logoutButton}
+              >
+                退出登录
+              </button>
+            </div>
+          )}
+        </header>
 
-          {!isAuthenticated && (
-            <div className={styles.loginContainer}>
-              <p>请使用您的 Google 账户登录:</p>
+        {!isAuthenticated && (
+          <div className={styles.loginContainer}>
+            <p>请使用您的 Google 账户登录:</p>
+            <GoogleOAuthProvider clientId={googleClientId}>
               <GoogleLogin
-                onSuccess={handleLoginSuccess}
-                onError={handleLoginError}
-                useOneTap // Enables One Tap login if available
+                //@ts-ignore
+                flow="auth-code"
+                onSuccess={onSuccess}
+                onError={onError}
+                useOneTap={false}
+                scope="openid email profile https://gool"
+                access_type="offline"
+                prompt="consent"
+                className="w-full max-w-md"
               />
-            </div>
-          )}
+            </GoogleOAuthProvider>
+          </div>
+        )}
 
-          {showChat && isAuthenticated && (
-            <div className={styles.chatWrapper}>
-              <Chat
-                navbar={{ title: '聊天机器人' }}
-                messages={messages}
-                renderMessageContent={renderMessageContent}
-                onSend={handleSend}
-                locale="zh-CN" // Set locale to Chinese
-                placeholder="请输入您想发送的消息..." // Placeholder for input
-              />
-            </div>
-          )}
+        {showChat && isAuthenticated && (
+          <div className={styles.chatWrapper}>
+            <Chat
+              navbar={{ title: '聊天机器人' }}
+              messages={messages}
+              renderMessageContent={renderMessageContent}
+              onSend={handleSend}
+              locale="zh-CN" // Set locale to Chinese
+              placeholder="请输入您想发送的消息..." // Placeholder for input
+            />
+          </div>
+        )}
 
-          {!showChat && !isAuthenticated && (
-            <div className={styles.placeholderChat}>
-              <p>登录后将在此处显示聊天界面。</p>
-            </div>
-          )}
-        </div>
-      </GoogleOAuthProvider>
+        {!showChat && !isAuthenticated && (
+          <div className={styles.placeholderChat}>
+            <p>登录后将在此处显示聊天界面。</p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };
 
-export default AboutPage;
+export default CodeModePage;

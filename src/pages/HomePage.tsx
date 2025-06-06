@@ -1,5 +1,5 @@
 // src/pages/HomePage.tsx
-import React, { useState, useEffect } from 'react';
+import { useState } from 'react';
 import styles from '../App.module.css'; // Import CSS module
 import aiChatSVG from '../assets/ai-chat.svg';
 import ChatDialog from '../components/ChatDialog'; // Import ChatDialog component

@@ -10,11 +10,15 @@ const Layout = () => {
           <div className="text-xl font-bold">My App</div>
           <div className="flex space-x-6">
             <Link to="/" className="text-gray-700 hover:text-blue-600 transition-colors">
-              Home
+              Home Page
             </Link>
             <div></div>
             <Link to="/about" className="text-gray-700 hover:text-blue-600 transition-colors">
-              About
+              About Page
+            </Link>
+            <div></div>
+            <Link to="/codemode" className="text-gray-700 hover:text-blue-600 transition-colors">
+              Code Mode Page
             </Link>
           </div>
         </nav>

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
-    "build:lib": "tsc && vite build --config vite.config.ts",
+    "build:lib": "tsc && vite build --config vite.config.ts --mode sit",
     "start:chat-app-server": "node chat-app-server.js",
     "lint": "eslint .",
     "preview": "vite preview"

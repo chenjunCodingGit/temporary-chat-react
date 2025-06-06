@@ -1,10 +1,9 @@
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
 import { routes } from './routes';
 import '@chatui/core/dist/index.css';
 import './styles/chatui-theme.css';
 import './index.css';
-
 
 const router = createBrowserRouter(routes);
 
