@@ -1,117 +1,83 @@
-const axios = require('axios');
-const { OAuth2Client } = require('google-auth-library');
 const router = require('express').Router();
-const { google } = require('googleapis');
-// process.env.GOOGLE_REDIRECT_URI,
+const { OAuth2Client } = require('google-auth-library');
+const axios = require('axios'); // 引入 axios
 
-const oauth2Client = new google.auth.OAuth2(
-  process.env.GOOGLE_CLIENT_ID,
-  process.env.GOOGLE_CLIENT_SECRET,
-  'postmessage'
-);
+// 初始化 OAuth2Client，我们仍然需要它来验证 id_token
+const client = new OAuth2Client({
+  clientId: process.env.GOOGLE_CLIENT_ID,
+  clientSecret: process.env.GOOGLE_CLIENT_SECRET,
+  redirectUri: 'postmessage', 
+  requestOptions: {
+    timeout: 30000, 
+  },
+});
 
 router.get('/', async (req, res, next) => {
   res.send({ message: 'Ok api is working 🚀' });
 });
 
-router.post('/create-tokens', async (req, res, next) => {
+router.post('/authgoogle', async (req, res, next) => {
   try {
     const { code } = req.body;
-    console.log(' code:', code);
+    if (!code) {
+      return res.status(400).json({ message: 'Authorization code is missing.' });
+    }
+    console.log('Received authorization code on backend:', code);
 
-    const client = new OAuth2Client({
-      clientId: process.env.GOOGLE_CLIENT_ID,
-      clientSecret: process.env.GOOGLE_CLIENT_SECRET,
-    });
-    
-    const { tokens_Library } = await client.getToken({
-      code,
-      redirect_uri: 'postmessage'
-    });
-    
-    console.log('tokens_Library:', tokens_Library);
-
-    const { tokens } = await oauth2Client.getToken({
-      code,
-      scope: 'openid email profile https://www.googleapis.com/auth/calendar'
-    }).catch(err => {
-      console.error('Error getting token:', err);
-      throw new Error('Failed to get token');
-    });
-    console.log('tokens:', tokens);
-    res.send(tokens);
-  } catch (error) {
-    next(error);
-  }
-})
-
-router.post('/authgoogle', async (req, res) => {
-  const { code } = req.body;
-  console.log('Received /api/auth/google code:', code);
-  try {
+    // *********************************************************************************
+    // ** 最终修复方案：手动进行 Token 交换 **
+    // 由于 `client.getToken()` 持续引发 'invalid_grant' 错误，
+    // 我们现在绕过该方法，使用 axios 手动发送 POST 请求到 Google 的 token 端点。
+    // 这让我们能够完全控制请求体，确保不包含任何多余的参数（如 code_verifier）。
+    // *********************************************************************************
     const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
-      code,
       client_id: process.env.GOOGLE_CLIENT_ID,
       client_secret: process.env.GOOGLE_CLIENT_SECRET,
-      redirect_uri: 'postmessage',
+      code,
       grant_type: 'authorization_code',
-      scope: 'openid email profile https://www.googleapis.com/auth/calendar'
+      redirect_uri: 'postmessage', // 必须与前端和客户端配置相匹配
     }, {
       headers: {
-        'Content-Type': 'application/json'
+        'Content-Type': 'application/x-www-form-urlencoded',
       },
-      timeout: 10000
+       timeout: 30000,
     });
 
     const tokens = tokenResponse.data;
-    console.log('Tokens from direct API:', tokens);
 
-    const userInfo = await axios.get('https://www.googleapis.com/oauth2/v3/userinfo', {
-      headers: {
-        Authorization: `Bearer ${tokens.access_token}`
-      }
+    console.log('Successfully exchanged code for tokens:', tokens);
+    
+    // 成功获取 tokens 后，我们继续使用 google-auth-library 来验证 ID token
+    // 因为这是它的强项，而且很安全
+    const ticket = await client.verifyIdToken({
+        idToken: tokens.id_token,
+        audience: process.env.GOOGLE_CLIENT_ID,
     });
+    const payload = ticket.getPayload();
+    
+    console.log('User Info (from ID Token):', payload);
 
-    console.log('User Info:', userInfo.data);
-    res.json({ tokens, user: userInfo.data });
+    // 成功后，将 tokens 和用户信息返回给前端
+    res.status(200).json({
+      message: 'Authentication successful!',
+      tokens: tokens,
+      user: payload,
+    });
 
   } catch (error) {
-    console.error('Token exchange error:', error.response?.data || error.message);
-
-    // 详细错误分析
-    if (error.response) {
-      console.error('HTTP status:', error.response.status);
-      console.error('Error details:', error.response.data);
-
-      // 特定错误处理
-      if (error.response.data.error === 'invalid_grant') {
-        console.error('Possible causes: expired code, incorrect credentials, or scope mismatch');
-      }
+    // 捕获并记录更详细的错误信息
+    console.error('Failed to exchange authorization code.');
+    if (error.response?.data) {
+        console.error('Error Details from Google:', error.response.data);
+    } else if (error.code) {
+        console.error(`Network or Request Error Code: ${error.code}`);
+        console.error('Raw Error:', error.message);
+    } else {
+        console.error('Raw Error:', error.message);
     }
-
-    res.status(500).json({
-      error: 'Failed to authenticate',
-      details: error.response?.data || error.message
-    });
+    // 将错误传递给全局错误处理中间件
+    next(error);
   }
 });
-
-router.get('/testing', async (req, res, next) => {
-  try {
-    const { tokens } = await oauth2Client.getToken({
-      code: '4/0AUJR-x5lbcsIBoADL5DuitsQD2LBe8gf8YOtyQ8bQ2WCpaR_gQ-expH_u6d1kkxvo8CEqA',
-      scope: 'openid email profile https://www.googleapis.com/auth/calendar'
-    }).catch(err => {
-      console.error('Error getting token:', err);
-      throw new Error('Failed to get token');
-    });
-    console.log('tokens:', tokens);
-    res.send({ message: 'Ok Testing api' });
-  } catch (error) {
-
-    console.error('Error in testing route:', error);
-    // next(error);
-  }
-})
 
 module.exports = router;
