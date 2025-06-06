@@ -4,9 +4,7 @@ import path from 'path'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
-  console.log(`当前环境: ${mode}`); // 输出当前环境模式
   const env = loadEnv(mode, process.cwd(), '');
-  console.log(`当前环境: ${env.BASE_PATH}`); // 输出当前环境模式
 
   return {
     envPrefix: ['VITE_', 'BUILD_', 'BASE_'],
@@ -20,7 +18,7 @@ export default defineConfig(({ mode }) => {
         '/api': {
           target: 'http://localhost:4000',
           changeOrigin: true,
-          rewrite: (path) => path.replace(/^\/api/, ''),
+          // rewrite: (path) => path.replace(/^\/api/, ''),
         },
       },
     },
