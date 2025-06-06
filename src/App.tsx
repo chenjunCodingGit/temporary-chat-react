@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from 'react';
+import { nanoid } from 'nanoid'; // For generating unique IDs
+import { jwtDecode } from "jwt-decode"; // To decode JWT token from Google
 import { GoogleOAuthProvider, GoogleLogin, CredentialResponse } from '@react-oauth/google';
 import Chat, { Bubble, useMessages, MessageProps } from '@chatui/core';
 import '@chatui/core/dist/index.css';
@@ -8,8 +10,6 @@ import aiChatSVG from './assets/ai-chat.svg';
 
 import ChatDialog from './components/ChatDialog';
 import styles from './App.module.css'; // Import CSS module
-import { nanoid } from 'nanoid'; // For generating unique IDs
-import { jwtDecode } from "jwt-decode"; // To decode JWT token from Google
 
 // Define the structure for user profile
 interface UserProfile {
@@ -29,9 +29,9 @@ const App: React.FC = () => {
     setIsChatOpen(!isChatOpen);
   };
 
-  // Your Google Client ID
-  // IMPORTANT: Replace with your actual Google Client ID
-  const googleClientId = "641028587481-0g3e663i76i3lffcjd57oi7uekn42ae5.apps.googleusercontent.com";
+  const { VITE_GOOGLE_CLIENT_ID } = import.meta.env;
+
+  const googleClientId = VITE_GOOGLE_CLIENT_ID;
 
   // Handle successful Google login
   const handleLoginSuccess = (credentialResponse: CredentialResponse) => {
