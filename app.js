@@ -1,13 +1,25 @@
 const express = require('express');
-const axios = require('axios');
 const createError = require('http-errors');
 const morgan = require('morgan');
+const mongoose = require('mongoose'); // 引入 mongoose
 require('dotenv').config();
 
 const app = express();
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(morgan('dev'));
+
+// =================== 新增部分: 连接到 MongoDB ===================
+mongoose.connect(process.env.MONGODB_URI)
+  .then(() => {
+    console.log('✅ Connected to MongoDB');
+  })
+  .catch((error) => {
+    console.error('❌ MongoDB connection error:', error);
+    // 如果无法连接到数据库，则退出进程
+    process.exit(1);
+  });
+// =============================================================
 
 app.get('/', async (req, res, next) => {
   res.send({ message: 'Awesome it works 🐻' });
@@ -27,22 +39,5 @@ app.use((err, req, res, next) => {
   });
 });
 
-const testConnectivity = async () => {
-  try {
-    const response = await axios.get('https://oauth2.googleapis.com', {
-      timeout: 5000
-    });
-    console.log('Connectivity test success:', response.status);
-  } catch (err) {
-    console.error('Connectivity test failed:', err.message);
-  }
-};
-
-testConnectivity().then(() => {
-  console.log('Google API is reachable.');
-}).catch(err => {
-  console.error('Error during connectivity test:', err.message);
-});
-
-const PORT = process.env.PORT || 3000;
+const PORT = process.env.PORT || 4000; // 你的端口是4000
 app.listen(PORT, () => console.log(`🚀 @ http://localhost:${PORT}`));

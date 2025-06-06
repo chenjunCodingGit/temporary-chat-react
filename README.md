@@ -18,3 +18,10 @@ curl -X POST http://localhost:4000/api/refresh-token \
 -H "Content-Type: application/json" \
 -d '{"userId": "YOUR_USER_ID"}'
 ```
+
+## MongoDB
+```
+brew services start mongodb/brew/mongodb-community
+brew services list
+default port: 27017
+```
