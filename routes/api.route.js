@@ -2,6 +2,13 @@ const router = require('express').Router();
 const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios'); // 引入 axios
 
+// =================== 新增部分 1: 模拟数据库 ===================
+// 在真实的应用中, 你会使用像 MongoDB, PostgreSQL, 或者 Firestore 这样的数据库。
+// 为了演示，我们使用一个简单的内存对象来存储用户信息。
+// 键是用户的 Google ID (sub), 值是用户信息和 token。
+const userStore = {};
+// =============================================================
+
 // 初始化 OAuth2Client，我们仍然需要它来验证 id_token
 const client = new OAuth2Client({
   clientId: process.env.GOOGLE_CLIENT_ID,
@@ -24,18 +31,12 @@ router.post('/authgoogle', async (req, res, next) => {
     }
     console.log('Received authorization code on backend:', code);
 
-    // *********************************************************************************
-    // ** 最终修复方案：手动进行 Token 交换 **
-    // 由于 `client.getToken()` 持续引发 'invalid_grant' 错误，
-    // 我们现在绕过该方法，使用 axios 手动发送 POST 请求到 Google 的 token 端点。
-    // 这让我们能够完全控制请求体，确保不包含任何多余的参数（如 code_verifier）。
-    // *********************************************************************************
     const tokenResponse = await axios.post('https://oauth2.googleapis.com/token', {
       client_id: process.env.GOOGLE_CLIENT_ID,
       client_secret: process.env.GOOGLE_CLIENT_SECRET,
       code,
       grant_type: 'authorization_code',
-      redirect_uri: 'postmessage', // 必须与前端和客户端配置相匹配
+      redirect_uri: 'postmessage', 
     }, {
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -44,29 +45,47 @@ router.post('/authgoogle', async (req, res, next) => {
     });
 
     const tokens = tokenResponse.data;
-
     console.log('Successfully exchanged code for tokens:', tokens);
     
-    // 成功获取 tokens 后，我们继续使用 google-auth-library 来验证 ID token
-    // 因为这是它的强项，而且很安全
     const ticket = await client.verifyIdToken({
         idToken: tokens.id_token,
         audience: process.env.GOOGLE_CLIENT_ID,
     });
     const payload = ticket.getPayload();
-    
     console.log('User Info (from ID Token):', payload);
+    
+    // =================== 新增部分 2: 存储用户信息和 Refresh Token ===================
+    const userId = payload.sub; // Google 用户的唯一 ID
 
-    // 成功后，将 tokens 和用户信息返回给前端
+    // 检查这个用户是否是第一次登录, 或者我们是否需要更新 refresh token
+    // Google 只在第一次授权时提供 refresh_token
+    if (tokens.refresh_token) {
+      console.log(`Storing refresh token for user: ${userId}`);
+      userStore[userId] = {
+        email: payload.email,
+        name: payload.name,
+        picture: payload.picture,
+        refreshToken: tokens.refresh_token, // 保存 refresh token
+      };
+    } else {
+      console.log(`User ${userId} already exists, no new refresh token provided.`);
+    }
+
+    // 打印当前的用户存储来验证
+    console.log('Current User Store:', userStore);
+    // =================================================================================
+
+    // 为了安全, 不要将 refresh_token 直接发送回客户端
+    // 只返回 access_token 和用户信息
     res.status(200).json({
       message: 'Authentication successful!',
-      tokens: tokens,
+      accessToken: tokens.access_token,
+      accessTokenExpiresAt: Date.now() + tokens.expires_in * 1000,
       user: payload,
     });
 
   } catch (error) {
-    // 捕获并记录更详细的错误信息
-    console.error('Failed to exchange authorization code.');
+    console.error('Failed in /authgoogle route.');
     if (error.response?.data) {
         console.error('Error Details from Google:', error.response.data);
     } else if (error.code) {
@@ -75,7 +94,6 @@ router.post('/authgoogle', async (req, res, next) => {
     } else {
         console.error('Raw Error:', error.message);
     }
-    // 将错误传递给全局错误处理中间件
     next(error);
   }
 });
