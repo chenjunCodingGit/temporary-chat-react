@@ -1,8 +1,29 @@
+const { ConfidentialClientApplication } = require('@azure/msal-node');
 const router = require('express').Router();
 const { OAuth2Client } = require('google-auth-library');
 const axios = require('axios');
 const crypto = require('crypto');
 const User = require('../models/User.model.js'); // 引入 User 模型
+
+/**
+ * Microsoft Azure B2C 配置
+ * 注意: 确保在环境变量中设置了 MS_CLIENT_ID, MS_TENANT_ID 和 MS_CLIENT_SECRET
+ * 这些变量应该在你的 .env 文件中定义
+ * 例如:
+ * MS_CLIENT_ID=your-client-id
+ * MS_TENANT_ID=your-tenant-id
+ * MS_CLIENT_SECRET=your-client-secret
+*/
+const msalConfig = {
+  auth: {
+    clientId: process.env.MS_CLIENT_ID,
+    authority: `https://${process.env.MS_TENANT_ID}.b2clogin.com/${process.env.MS_TENANT_ID}/B2C_1_signin-signup`, // 包含用户流名称
+    clientSecret: process.env.MS_CLIENT_SECRET
+  }
+};
+
+const cca = new ConfidentialClientApplication(msalConfig);
+
 
 // =================== 加密配置和函数 ===================
 const algorithm = 'aes-256-cbc';
@@ -149,6 +170,29 @@ router.post('/refresh-token', async (req, res, next) => {
     }
     next(error);
   }
+});
+
+// MS: 获取授权URL
+router.get('/auth-url', async (req, res) => {
+  const authCodeUrlParameters = {
+    scopes: ['api.read'], // 使用后端API的范围
+    redirectUri: process.env.MS_REDIRECT_URI,
+    p: 'B2C_1_signin-signup' // 显式指定用户流名称
+  };
+  const authUrl = await cca.getAuthCodeUrl(authCodeUrlParameters);
+  res.json({ url: authUrl });
+});
+
+// MS: 交换令牌
+router.post('/token', express.urlencoded({ extended: true }), async (req, res) => {
+  const tokenRequest = {
+    code: req.body.code,
+    scopes: ['api.read'],
+    redirectUri: process.env.MS_REDIRECT_URI,
+    p: 'B2C_1_signin-signup' // 显式指定用户流名称
+  };
+  const tokenResponse = await cca.acquireTokenByCode(tokenRequest);
+  res.json(tokenResponse);
 });
 
 module.exports = router;
