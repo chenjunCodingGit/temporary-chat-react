@@ -22,7 +22,7 @@ export interface MessageContainerProps {
 }
 
 export interface MessageContainerHandle {
-  ref: React.RefObject<HTMLDivElement>;
+  ref: React.RefObject<HTMLDivElement | null>;
   scrollToEnd: (options?: ScrollToEndOptions) => void;
 }
 

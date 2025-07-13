@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { IconButton, IconButtonProps } from '../IconButton';
+import { withPrefix } from '../../utils/withPrefix';
 
 export type NavbarProps = {
   title: string;
@@ -20,21 +21,21 @@ export const Navbar = (props: NavbarProps) => {
   const showTitle = isLeft ? true : !logo;
 
   return (
-    <header className={clsx('Navbar', { 'Navbar--left': isLeft }, className)}>
-      <div className="Navbar-left">{leftContent && <IconButton size="lg" {...leftContent} />}</div>
-      <div className="Navbar-main">
+    <header className={clsx(withPrefix('Navbar'), { [withPrefix('Navbar--left')]: isLeft }, className)}>
+      <div className={`${withPrefix("Navbar-left")}`}>{leftContent && <IconButton size="lg" {...leftContent} />}</div>
+      <div className={`${withPrefix("Navbar-main")}`}>
         {logo && (
-          <div className="Navbar-brand">
-            <img className="Navbar-logo" src={logo} alt={title} />
+          <div className={`${withPrefix("Navbar-brand")}`}>
+            <img className={`${withPrefix("Navbar-logo")}`} src={logo} alt={title} />
           </div>
         )}
-        <div className="Navbar-inner">
-          {showTitle && <h2 className="Navbar-title">{title}</h2>}
-          <div className="Navbar-desc">{desc}</div>
+        <div className={`${withPrefix("Navbar-inner")}`}>
+          {showTitle && <h2 className={`${withPrefix("Navbar-title")}`}>{title}</h2>}
+          <div className={`${withPrefix("Navbar-desc")}`}>{desc}</div>
         </div>
       </div>
-      <div className="Navbar-right">
-        <div className="Navbar-rightSlot">{rightSlot}</div>
+      <div className={`${withPrefix("Navbar-right")}`}>
+        <div className={`${withPrefix("Navbar-rightSlot")}`}>{rightSlot}</div>
         {rightContent.map((item) => (
           <IconButton size="lg" key={item.icon} {...item} />
         ))}

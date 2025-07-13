@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { withPrefix } from '../../utils/withPrefix';
 
 export type AvatarSize = 'sm' | 'md' | 'lg';
 
@@ -12,6 +13,7 @@ export interface AvatarProps {
   url?: string;
   size?: AvatarSize;
   shape?: AvatarShape;
+  children?: React.ReactNode;
 }
 
 export const Avatar: React.FC<AvatarProps> = (props) => {
@@ -20,7 +22,7 @@ export const Avatar: React.FC<AvatarProps> = (props) => {
   const Element = url ? 'a' : 'span';
   return (
     <Element
-      className={clsx('Avatar', `Avatar--${size}`, `Avatar--${shape}`, className)}
+      className={clsx(withPrefix('Avatar'), withPrefix(`Avatar--${size}`), withPrefix(`Avatar--${shape}`), className)}
       href={url}
     >
       {src ? <img src={src} alt={alt} /> : children}
