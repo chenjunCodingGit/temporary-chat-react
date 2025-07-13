@@ -1,5 +1,7 @@
 import React, { useEffect } from 'react';
 import { createBrowserRouter, RouterProvider } from 'react-router-dom';
+import { MsalProvider } from '@azure/msal-react';
+import { msalInstance } from './utils/authConfig';
 import { routes } from './routes';
 import '@chatui/core/dist/index.css';
 import './styles/chatui-theme.css';
@@ -14,7 +16,9 @@ const App: React.FC = () => {
 
   return (
     <div>
-      <RouterProvider router={router} />
+      <MsalProvider instance={msalInstance}>
+        <RouterProvider router={router} />
+      </MsalProvider>
     </div>
   );
 };
