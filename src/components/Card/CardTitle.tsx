@@ -6,6 +6,7 @@ export type CardTitleProps = {
   title?: React.ReactNode;
   subtitle?: React.ReactNode;
   center?: boolean;
+  children?: React.ReactNode;
 };
 
 export const CardTitle: React.FC<CardTitleProps> = (props) => {

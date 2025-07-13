@@ -7,6 +7,8 @@ export interface TextProps {
   align?: 'left' | 'center' | 'right' | 'justify';
   breakWord?: boolean;
   truncate?: boolean | number;
+  title?: string;
+  children?: React.ReactNode;
 }
 
 export const Text: React.FC<TextProps> = (props) => {

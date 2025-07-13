@@ -25,10 +25,12 @@ export type ComposerProps = {
   inputOptions?: InputProps;
   placeholder?: string;
   inputType?: InputType;
+  allowedFileTypes?: string[];
   onInputTypeChange?: (inputType: InputType) => void;
   recorder?: RecorderProps;
   onSend: (type: string, content: string) => void;
   onImageSend?: (file: File) => Promise<any>;
+  onFileSelected?: (file: File, fileInfo: { name: string; extension: string; size: number },) => void;
   onFocus?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
   onChange?: (value: string, event: React.ChangeEvent<Element>) => void;
   onBlur?: (event: React.FocusEvent<HTMLTextAreaElement>) => void;
@@ -51,12 +53,14 @@ export const Composer = React.forwardRef<ComposerHandle, ComposerProps>((props, 
     wideBreakpoint,
     placeholder: oPlaceholder = '请输入...',
     recorder = {},
+    allowedFileTypes = ['.docx', '.doc', '.xlsx', '.xls', '.pptx', '.ppt', '.pdf'],
     onInputTypeChange,
     onFocus,
     onBlur,
     onChange,
     onSend,
     onImageSend,
+    onFileSelected,
     onAccessoryToggle,
     toolbar = [],
     onToolbarClick,
@@ -295,6 +299,7 @@ export const Composer = React.forwardRef<ComposerHandle, ComposerProps>((props, 
 
   const inputProps = {
     ...inputOptions,
+    allowedFileTypes,
     value: text,
     inputRef,
     placeholder,
@@ -303,6 +308,7 @@ export const Composer = React.forwardRef<ComposerHandle, ComposerProps>((props, 
     onKeyDown: handleInputKeyDown,
     onChange: handleTextChange,
     onImageSend,
+    onFileSelected,
   };
 
   if (isWide) {

@@ -72,7 +72,7 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
     /**
      * 快捷短语渲染函数
      */
-    renderQuickReplies?: () => void;
+    renderQuickReplies?: () => React.ReactNode;
     /**
      * 输入区 ref
      */
@@ -106,6 +106,10 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
      */
     // onImageSend?: (file: File) => Promise<any>;
     /**
+     * 发送文件回调
+     */
+    // onFileSelected?: (file: File) => Promise<any>;
+    /**
      * 输入方式
      */
     // inputType?: InputType;
@@ -129,6 +133,10 @@ export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
      * 点击附加内容回调
      */
     // onAccessoryToggle?: () => void;
+    /**
+     * Files allowed to be uploaded
+     */
+    allowedFileTypes?: string[];
     /**
      * 输入组件
      */
@@ -167,6 +175,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     onInputBlur,
     onSend,
     onImageSend,
+    onFileSelected,
     inputOptions,
     composerRef,
     inputType,
@@ -176,6 +185,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
     onToolbarClick,
     onAccessoryToggle,
     rightAction,
+    allowedFileTypes,
     Composer = DComposer,
     isX,
   } = props;
@@ -272,6 +282,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             textOnce={textOnce}
             inputOptions={inputOptions}
             placeholder={placeholder}
+            allowedFileTypes={allowedFileTypes}
             onAccessoryToggle={onAccessoryToggle}
             recorder={recorder}
             toolbar={toolbar}
@@ -282,6 +293,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
             onBlur={onInputBlur}
             onSend={onSend}
             onImageSend={onImageSend}
+            onFileSelected={onFileSelected}
             rightAction={rightAction}
           />
         </div>

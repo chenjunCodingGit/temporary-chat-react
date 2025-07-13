@@ -1,6 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
-import { Icon } from '../Icon';
+import { Icon } from './Icon';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
@@ -64,7 +64,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, r
       {...other}
     >
       {icon && (
-        <span className={["Btn-icon", className].join(' ')}>
+        <span className="Btn-icon">
           <Icon type={icon} spin={loading} />
         </span>
       )}

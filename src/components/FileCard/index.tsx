@@ -11,6 +11,7 @@ export interface FileCardProps {
   className?: string;
   file: File;
   extension?: string;
+  children?: React.ReactNode;
 }
 
 export const FileCard: React.FC<FileCardProps> = (props) => {
@@ -28,11 +29,19 @@ export const FileCard: React.FC<FileCardProps> = (props) => {
           </Text>
         </div>
         <FlexItem>
-          <Text truncate={2} breakWord className="FileCard-name">
-            {name}
-          </Text>
+          {
+            name.toString().length > 60 ? (
+              <Text truncate={2} title={name} breakWord className="FileCard-name">
+                {name}
+              </Text>
+            ) : (
+              <Text truncate={2} breakWord className="FileCard-name">
+                {name}
+              </Text>
+            )
+          }
           <div className="FileCard-meta">
-            {size != null && <span className="FileCard-size">{prettyBytes(size)}</span>}
+            {(size != null && size > 0) && <span className="FileCard-size">{size > 0 ? prettyBytes(size) : ''}</span>}
             {children}
           </div>
         </FlexItem>
