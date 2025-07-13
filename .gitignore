@@ -33,3 +33,4 @@ dist-ssr
 .env.*.local
 dist
 dist-lib
+dist-embed

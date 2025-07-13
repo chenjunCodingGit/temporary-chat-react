@@ -20,7 +20,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 
 // 托管 dist-lib 目录下的静态文件
-app.use(express.static(path.join(__dirname, 'dist-lib')));
+app.use(express.static(path.join(__dirname, 'dist-embed')));
 
 app.listen(port, () => {
   console.log(`Chat App Server (React Component Library) listening at http://localhost:${port}`);
