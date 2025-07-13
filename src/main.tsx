@@ -15,14 +15,14 @@ const { VITE_CHATSDK_WIDEGT_ID } = import.meta.env;
 const { OmnichannelChatSDK_1: OmnichannelChatSDK } = window as any;
 console.log('OmnichannelChatSDK: ', OmnichannelChatSDK);
 
-// const chatSDK = new OmnichannelChatSDK.default({
-//   orgId: VITE_CHATSDK_ORG_ID,
-//   orgUrl: VITE_CHATSDK_ORG_URL,
-//   widgetId: VITE_CHATSDK_WIDEGT_ID,
-// });
+const chatSDK = new OmnichannelChatSDK.default({
+  orgId: VITE_CHATSDK_ORG_ID,
+  orgUrl: VITE_CHATSDK_ORG_URL,
+  widgetId: VITE_CHATSDK_WIDEGT_ID,
+});
 
-// await chatSDK.initialize();
-// await chatSDK.startChat();
+await chatSDK.initialize();
+await chatSDK.startChat();
 
 // console.table(await chatSDK.getMessages());
 
