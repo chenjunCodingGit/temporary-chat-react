@@ -8,5 +8,6 @@ export interface AvatarProps {
     url?: string;
     size?: AvatarSize;
     shape?: AvatarShape;
+    children?: React.ReactNode;
 }
 export declare const Avatar: React.FC<AvatarProps>;

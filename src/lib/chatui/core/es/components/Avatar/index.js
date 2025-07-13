@@ -1,5 +1,6 @@
 import React from 'react';
 import clsx from 'clsx';
+import { withPrefix } from '../../utils/withPrefix';
 export var Avatar = function Avatar(props) {
   var className = props.className,
     src = props.src,
@@ -12,7 +13,7 @@ export var Avatar = function Avatar(props) {
     children = props.children;
   var Element = url ? 'a' : 'span';
   return /*#__PURE__*/React.createElement(Element, {
-    className: clsx('Avatar', "Avatar--".concat(size), "Avatar--".concat(shape), className),
+    className: clsx(withPrefix('Avatar'), withPrefix("Avatar--".concat(size)), withPrefix("Avatar--".concat(shape)), className),
     href: url
   }, src ? /*#__PURE__*/React.createElement("img", {
     src: src,

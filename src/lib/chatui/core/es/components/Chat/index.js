@@ -6,6 +6,7 @@ import { MessageContainer } from '../MessageContainer';
 import { QuickReplies } from '../QuickReplies';
 import { Composer as DComposer } from '../Composer';
 import { isSafari, getIOSMajorVersion } from '../../utils/ua';
+import { withPrefix } from '../../utils/withPrefix';
 export var Chat = /*#__PURE__*/React.forwardRef(function (props, ref) {
   var wideBreakpoint = props.wideBreakpoint,
     _props$locale = props.locale,
@@ -112,7 +113,7 @@ export var Chat = /*#__PURE__*/React.forwardRef(function (props, ref) {
     colorScheme: currentColorScheme,
     elderMode: elderMode
   }, /*#__PURE__*/React.createElement("div", {
-    className: "ChatApp",
+    className: "".concat(withPrefix('ChatApp')),
     "data-elder-mode": elderMode,
     "data-x": isX,
     ref: ref
@@ -128,7 +129,7 @@ export var Chat = /*#__PURE__*/React.forwardRef(function (props, ref) {
     onBackBottomShow: onBackBottomShow,
     onBackBottomClick: onBackBottomClick
   }), /*#__PURE__*/React.createElement("div", {
-    className: "ChatFooter"
+    className: "".concat(withPrefix('ChatFooter'))
   }, renderQuickReplies ? renderQuickReplies() : /*#__PURE__*/React.createElement(QuickReplies, {
     items: quickReplies,
     visible: quickRepliesVisible,

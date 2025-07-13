@@ -14,6 +14,7 @@ var _MessageContainer = require("../MessageContainer");
 var _QuickReplies = require("../QuickReplies");
 var _Composer = require("../Composer");
 var _ua = require("../../utils/ua");
+var _withPrefix = require("../../utils/withPrefix");
 function _getRequireWildcardCache(e) { if ("function" != typeof WeakMap) return null; var r = new WeakMap(), t = new WeakMap(); return (_getRequireWildcardCache = function _getRequireWildcardCache(e) { return e ? t : r; })(e); }
 function _interopRequireWildcard(e, r) { if (!r && e && e.__esModule) return e; if (null === e || "object" != _typeof(e) && "function" != typeof e) return { default: e }; var t = _getRequireWildcardCache(r); if (t && t.has(e)) return t.get(e); var n = { __proto__: null }, a = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var u in e) if ("default" !== u && {}.hasOwnProperty.call(e, u)) { var i = a ? Object.getOwnPropertyDescriptor(e, u) : null; i && (i.get || i.set) ? Object.defineProperty(n, u, i) : n[u] = e[u]; } return n.default = e, t && t.set(e, n), n; }
 var Chat = exports.Chat = /*#__PURE__*/_react.default.forwardRef(function (props, ref) {
@@ -122,7 +123,7 @@ var Chat = exports.Chat = /*#__PURE__*/_react.default.forwardRef(function (props
     colorScheme: currentColorScheme,
     elderMode: elderMode
   }, /*#__PURE__*/_react.default.createElement("div", {
-    className: "ChatApp",
+    className: "".concat((0, _withPrefix.withPrefix)('ChatApp')),
     "data-elder-mode": elderMode,
     "data-x": isX,
     ref: ref
@@ -138,7 +139,7 @@ var Chat = exports.Chat = /*#__PURE__*/_react.default.forwardRef(function (props
     onBackBottomShow: onBackBottomShow,
     onBackBottomClick: onBackBottomClick
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "ChatFooter"
+    className: "".concat((0, _withPrefix.withPrefix)('ChatFooter'))
   }, renderQuickReplies ? renderQuickReplies() : /*#__PURE__*/_react.default.createElement(_QuickReplies.QuickReplies, {
     items: quickReplies,
     visible: quickRepliesVisible,

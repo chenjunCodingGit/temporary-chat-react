@@ -1,6 +1,7 @@
 import React from 'react';
 import clsx from 'clsx';
 import { Icon } from '../Icon';
+import { withPrefix } from '../../utils/withPrefix';
 
 export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   className?: string;
@@ -16,7 +17,7 @@ export interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElemen
 }
 
 function composeClass(type?: string) {
-  return type && `Btn--${type}`;
+  return type && withPrefix(`Btn--${type}`);
 }
 
 export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, ref) => {
@@ -47,12 +48,12 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, r
   return (
     <button
       className={clsx(
-        'Btn',
+        withPrefix('Btn'),
         composeClass(color),
         composeClass(variant),
         composeClass(size),
         {
-          'Btn--block': block,
+          [withPrefix('Btn--block')]: block,
         },
         className,
       )}
@@ -64,7 +65,7 @@ export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>((props, r
       {...other}
     >
       {icon && (
-        <span className={["Btn-icon", className].join(' ')}>
+        <span className={[withPrefix("Btn-icon"), className].join(' ')}>
           <Icon type={icon} spin={loading} />
         </span>
       )}

@@ -1,8 +1,8 @@
 // src/components/ChatDialog.tsx
 import React, { useState, useEffect } from 'react';
 // @ts-ignore
-// import Chat, { Icon, IconButton, Bubble, useMessages, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton, RateActions } from '../lib/chatui/core/es/index';
-import Chat, { Icon, IconButton, Bubble, useMessages, MessageStatus, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton, RateActions } from '../lib/src/index';
+import Chat, { Icon, IconButton, Bubble, useMessages,MessageStatus, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton, RateActions } from '../lib/chatui/core/es/index';
+// import Chat, { Icon, IconButton, Bubble, useMessages, MessageStatus, FileCard, Card, CardMedia, CardTitle, CardText, CardActions, Button, Navbar, Input, Skeleton, RateActions } from '../lib/src/index';
 import chatbotAvatarSVG from '../assets/chatbot-avatar.svg';
 import styles from '../styles/ChatDialog.module.css';
 
@@ -237,15 +237,15 @@ const ChatDialog: React.FC<ChatDialogProps> = ({
                       </div>
                       <CardTitle className="CardTitle-Text-Left">Email</CardTitle>
                       <div style={{ width: '85%', marginLeft: '12px' }}>
-                        <Input value={value1} onChange={val => setValue1(val)} placeholder="Please input..." />
+                        <Input value={value1} onChange={(val:any) => setValue1(val)} placeholder="Please input..." />
                       </div>
                       <CardTitle className="CardTitle-Text-Left">First Name</CardTitle>
                       <div style={{ width: '85%', marginLeft: '12px' }}>
-                        <Input value={value2} onChange={val => setValue2(val)} placeholder="Please input..." />
+                        <Input value={value2} onChange={(val:any) => setValue2(val)} placeholder="Please input..." />
                       </div>
                       <CardTitle className="CardTitle-Text-Left">Last Name</CardTitle>
                       <div style={{ width: '85%', marginLeft: '12px' }}>
-                        <Input value={value3} onChange={val => setValue3(val)} placeholder="Please input..." />
+                        <Input value={value3} onChange={(val:any) => setValue3(val)} placeholder="Please input..." />
                       </div>
                       <CardActions>
                         <Button

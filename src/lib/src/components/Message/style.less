@@ -1,12 +1,12 @@
-.Message {
+.ali-Message {
   position: relative;
 
   & + & {
     margin-top: var(--gutter);
   }
   &.left {
-    .Message-main {
-      & > .Avatar {
+    .ali-Message-main {
+      & > .ali-Avatar {
         margin-right: var(--msg-avatar-gap);
       }
     }
@@ -15,16 +15,16 @@
     }
   }
   &.right {
-    .Message-main,
-    .Message-content {
+    .ali-Message-main,
+    .ali-Message-content {
       flex-direction: row-reverse;
     }
-    .Message-main {
-      & > .Avatar {
+    .ali-Message-main {
+      & > .ali-Avatar {
         margin-left: var(--msg-avatar-gap);
       }
     }
-    .Message-author {
+    .ali-Message-author {
       text-align: right;
     }
     .Bubble {
@@ -37,29 +37,29 @@
   }
 }
 
-.Message-meta {
+.ali-Message-meta {
   display: flex;
   justify-content: center;
   margin-bottom: 12px;
   text-align: center;
 }
 
-.Message-main > .Avatar {
+.ali-Message-main > .Avatar {
   --avatar-size: var(--rate-width);
 }
 
-.Message-main,
-.Message-content {
+.ali-Message-main,
+.ali-Message-content {
   display: flex;
   align-items: flex-start;
 }
 
-.Message-inner {
+.ali-Message-inner {
   flex: 1;
   min-width: 0;
 }
 
-.Message-author {
+.ali-Message-author {
   margin-bottom: 6px;
   color: var(--color-text-2);
   font-size: var(--font-size-xs);
@@ -67,7 +67,7 @@
 }
 
 // SystemMessage
-.SystemMessage {
+.ali-SystemMessage {
   padding: 0 15Px;
   color: var(--color-text-2);
   text-align: center;
@@ -82,7 +82,7 @@
   }
 }
 
-.SystemMessage-inner {
+.ali-SystemMessage-inner {
   position: relative;
   display: inline-block;
   padding: 6Px 9Px;
@@ -112,7 +112,7 @@
 }
 
 html[data-color-scheme="dark"] {
-  .SystemMessage-inner {
+  .ali-SystemMessage-inner {
     background: var(--color-fill-2);
 
     &::before {
@@ -124,8 +124,8 @@ html[data-color-scheme="dark"] {
   }
 }
 
-.ChatApp[data-elder-mode="true"] {
-  .SystemMessage-inner {
+.ali-ChatApp[data-elder-mode="true"] {
+  .ali-SystemMessage-inner {
     padding: 7Px 14Px;
     font-size: 14Px;
   }

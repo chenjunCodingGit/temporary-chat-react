@@ -1,4 +1,4 @@
-.Btn {
+.ali-Btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
@@ -63,7 +63,7 @@
     // border-radius: @btn-border-radius-lg;
     --btn-font-size: var(--btn-font-size-lg);
 
-    .Btn-icon {
+    .ali-Btn-icon {
       vertical-align: -2px;
     }
   }
@@ -79,7 +79,7 @@
   }
 }
 
-.no-btn-flex .Btn:not(.Btn--block) {
+.no-btn-flex .ali-Btn:not(.ali-Btn--block) {
   display: inline-block;
 }
 
@@ -89,12 +89,18 @@
   margin-right: 4px;
 }
 
+.ali-Toolbar-btnIcon-Button {
+  background-color: @white !important;
+  border-radius: 6px !important;
+  margin-right: 4px;
+}
+
 @media (hover: hover) {
-  .Btn {
+  .ali-Btn {
     &:hover {
       --btn-bg: @btn-hover-bg;
     }
-    &--primary:not(.Btn--outline) {
+    &--primary:not(.ali-Btn--outline) {
       &:hover {
         --btn-bg: var(--btn-primary-bg);
         opacity: 0.9;
@@ -104,6 +110,22 @@
 }
 
 .Btn--text {
+  --btn-line-height: 1.5;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--link-color);
+  font-size: inherit;
+  font-weight: inherit;
+
+  &:hover,
+  &:active {
+    background: transparent;
+  }
+}
+
+.ali-Btn--text {
   --btn-line-height: 1.5;
   min-width: 0;
   padding: 0;

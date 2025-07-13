@@ -11,6 +11,7 @@ var _clsx = _interopRequireDefault(require("clsx"));
 var _SystemMessage = require("./SystemMessage");
 var _Avatar = require("../Avatar");
 var _Time = require("../Time");
+var _withPrefix = require("../../utils/withPrefix");
 var _excluded = ["renderMessageContent"];
 var Message = function Message(props) {
   var _props$renderMessageC = props.renderMessageContent,
@@ -38,26 +39,26 @@ var Message = function Message(props) {
   }
   var isRL = position === 'right' || position === 'left';
   return /*#__PURE__*/_react.default.createElement("div", {
-    className: (0, _clsx.default)('Message', position),
+    className: (0, _clsx.default)((0, _withPrefix.withPrefix)('Message'), position),
     "data-id": id,
     "data-type": type
   }, hasTime && createdAt && /*#__PURE__*/_react.default.createElement("div", {
-    className: "Message-meta"
+    className: "".concat((0, _withPrefix.withPrefix)("Message-meta"))
   }, /*#__PURE__*/_react.default.createElement(_Time.Time, {
     date: createdAt
   })), /*#__PURE__*/_react.default.createElement("div", {
-    className: "Message-main"
+    className: "".concat((0, _withPrefix.withPrefix)("Message-main"))
   }, isRL && avatar && /*#__PURE__*/_react.default.createElement(_Avatar.Avatar, {
     src: avatar,
     shape: "square",
     alt: name,
     url: user.url
   }), /*#__PURE__*/_react.default.createElement("div", {
-    className: "Message-inner"
+    className: "".concat((0, _withPrefix.withPrefix)("Message-inner"))
   }, isRL && name && /*#__PURE__*/_react.default.createElement("div", {
-    className: "Message-author"
+    className: "".concat((0, _withPrefix.withPrefix)("Message-author"))
   }, name), /*#__PURE__*/_react.default.createElement("div", {
-    className: "Message-content",
+    className: "".concat((0, _withPrefix.withPrefix)("Message-content")),
     role: "alert",
     "aria-live": "assertive",
     "aria-atomic": "false"

@@ -1,4 +1,4 @@
-.Navbar {
+.ali-Navbar {
   position: relative;
   z-index: @zindex-navbar;
   display: flex;
@@ -35,50 +35,50 @@
     width: auto;
     height: @navbar-logo-height;
   }
-  .IconBtn {
+  .ali-IconBtn {
     color: var(--color-text-1);
     font-size: 24Px;
   }
-  .IconBtn + .IconBtn,
-  .Navbar-rightSlot + .IconBtn {
+  .ali-IconBtn + .ali-IconBtn,
+  .ali-Navbar-rightSlot + .ali-IconBtn {
     margin-left: 12Px;
   }
 }
 
-.Navbar--left {
-  .Navbar-left {
+.ali-Navbar--left {
+  .ali-Navbar-left {
     width: 24Px;
   }
-  .Navbar-right {
+  .ali-Navbar-right {
     width: auto;
   }
-  .Navbar-main {
+  .ali-Navbar-main {
     min-height: 62Px;
     margin-left: 9Px;
     justify-content: flex-start;
   }
 }
 
-.Navbar-brand + .Navbar-inner {
+.ali-Navbar-brand + .ali-Navbar-inner {
   margin-left: 9Px;
 }
 
-.Navbar-desc {
+.ali-Navbar-desc {
   color: var(--color-text-2);
   font-size: 12Px;
 }
 
-.ChatApp[data-elder-mode='true'] {
-  .Navbar .IconBtn {
+.ali-ChatApp[data-elder-mode='true'] {
+  .ali-Navbar .ali-IconBtn {
     font-size: 26Px;
   }
-  .Navbar-logo {
+  .ali-Navbar-logo {
     height: 43Px;
   }
-  .Navbar-title {
+  .ali-Navbar-title {
     font-size: 18Px;
   }
-  .Navbar-desc {
+  .ali-Navbar-desc {
     font-size: 13Px;
   }
 }

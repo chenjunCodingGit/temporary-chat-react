@@ -9,6 +9,7 @@ import {
 import { QuickReplies, QuickReplyItemProps } from '../QuickReplies';
 import { Composer as DComposer, ComposerProps, ComposerHandle } from '../Composer';
 import { isSafari, getIOSMajorVersion } from '../../utils/ua';
+import { withPrefix } from '../../utils/withPrefix';
 
 export type ChatProps = Omit<ComposerProps, 'onFocus' | 'onChange' | 'onBlur'> &
   ConfigContextType &
@@ -245,7 +246,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
   return (
     <ConfigProvider locale={locale} locales={locales} colorScheme={currentColorScheme} elderMode={elderMode}>
       <div
-        className="ChatApp"
+        className={`${withPrefix('ChatApp')}`}
         data-elder-mode={elderMode}
         data-x={isX}
         ref={ref}
@@ -263,7 +264,7 @@ export const Chat = React.forwardRef<HTMLDivElement, ChatProps>((props, ref) => 
           onBackBottomShow={onBackBottomShow}
           onBackBottomClick={onBackBottomClick}
         />
-        <div className="ChatFooter">
+        <div className={`${withPrefix('ChatFooter')}`}>
           {renderQuickReplies ? (
             renderQuickReplies()
           ) : (

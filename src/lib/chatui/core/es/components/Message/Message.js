@@ -5,6 +5,7 @@ import clsx from 'clsx';
 import { SystemMessage } from './SystemMessage';
 import { Avatar } from '../Avatar';
 import { Time } from '../Time';
+import { withPrefix } from '../../utils/withPrefix';
 var Message = function Message(props) {
   var _props$renderMessageC = props.renderMessageContent,
     renderMessageContent = _props$renderMessageC === void 0 ? function () {
@@ -31,26 +32,26 @@ var Message = function Message(props) {
   }
   var isRL = position === 'right' || position === 'left';
   return /*#__PURE__*/React.createElement("div", {
-    className: clsx('Message', position),
+    className: clsx(withPrefix('Message'), position),
     "data-id": id,
     "data-type": type
   }, hasTime && createdAt && /*#__PURE__*/React.createElement("div", {
-    className: "Message-meta"
+    className: "".concat(withPrefix("Message-meta"))
   }, /*#__PURE__*/React.createElement(Time, {
     date: createdAt
   })), /*#__PURE__*/React.createElement("div", {
-    className: "Message-main"
+    className: "".concat(withPrefix("Message-main"))
   }, isRL && avatar && /*#__PURE__*/React.createElement(Avatar, {
     src: avatar,
     shape: "square",
     alt: name,
     url: user.url
   }), /*#__PURE__*/React.createElement("div", {
-    className: "Message-inner"
+    className: "".concat(withPrefix("Message-inner"))
   }, isRL && name && /*#__PURE__*/React.createElement("div", {
-    className: "Message-author"
+    className: "".concat(withPrefix("Message-author"))
   }, name), /*#__PURE__*/React.createElement("div", {
-    className: "Message-content",
+    className: "".concat(withPrefix("Message-content")),
     role: "alert",
     "aria-live": "assertive",
     "aria-atomic": "false"

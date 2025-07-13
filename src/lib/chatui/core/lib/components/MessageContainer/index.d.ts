@@ -13,7 +13,7 @@ export interface MessageContainerProps {
     onBackBottomClick?: () => void;
 }
 export interface MessageContainerHandle {
-    ref: React.RefObject<HTMLDivElement>;
+    ref: React.RefObject<HTMLDivElement | null>;
     scrollToEnd: (options?: ScrollToEndOptions) => void;
 }
 export declare const MessageContainer: React.ForwardRefExoticComponent<MessageContainerProps & React.RefAttributes<MessageContainerHandle>>;

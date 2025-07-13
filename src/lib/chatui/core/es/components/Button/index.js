@@ -1,11 +1,13 @@
 import _extends from "@babel/runtime/helpers/esm/extends";
+import _defineProperty from "@babel/runtime/helpers/esm/defineProperty";
 import _objectWithoutProperties from "@babel/runtime/helpers/esm/objectWithoutProperties";
 var _excluded = ["className", "label", "color", "variant", "size", "icon", "loading", "block", "disabled", "children", "onClick"];
 import React from 'react';
 import clsx from 'clsx';
 import { Icon } from '../Icon';
+import { withPrefix } from '../../utils/withPrefix';
 function composeClass(type) {
-  return type && "Btn--".concat(type);
+  return type && withPrefix("Btn--".concat(type));
 }
 export var Button = /*#__PURE__*/React.forwardRef(function (props, ref) {
   var className = props.className,
@@ -28,16 +30,14 @@ export var Button = /*#__PURE__*/React.forwardRef(function (props, ref) {
     }
   }
   return /*#__PURE__*/React.createElement("button", _extends({
-    className: clsx('Btn', composeClass(color), composeClass(variant), composeClass(size), {
-      'Btn--block': block
-    }, className),
+    className: clsx(withPrefix('Btn'), composeClass(color), composeClass(variant), composeClass(size), _defineProperty({}, withPrefix('Btn--block'), block), className),
     type: "button",
     disabled: disabled,
     "data-loading": loading,
     onClick: handleClick,
     ref: ref
   }, other), icon && /*#__PURE__*/React.createElement("span", {
-    className: ["Btn-icon", className].join(' ')
+    className: [withPrefix("Btn-icon"), className].join(' ')
   }, /*#__PURE__*/React.createElement(Icon, {
     type: icon,
     spin: loading

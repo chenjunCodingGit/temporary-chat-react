@@ -16,9 +16,9 @@ export var MessageStatus = function MessageStatus(_ref) {
     _useState2 = _slicedToArray(_useState, 2),
     type = _useState2[0],
     setType = _useState2[1];
-  var loadingTimerRef = useRef();
-  var failTimerRef = useRef();
-  var autoTimerRef = useRef();
+  var loadingTimerRef = useRef(undefined);
+  var failTimerRef = useRef(undefined);
+  var autoTimerRef = useRef(undefined);
   function clear() {
     if (loadingTimerRef.current) {
       clearTimeout(loadingTimerRef.current);
