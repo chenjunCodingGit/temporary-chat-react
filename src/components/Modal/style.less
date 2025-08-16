@@ -6,7 +6,7 @@
   bottom: 0;
   left: 0;
   height: 100%;
-  z-index: @zindex-modal;
+  z-index: @zindex-modal-max;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -24,7 +24,7 @@
 
 .Modal-dialog {
   position: relative;
-  z-index: @zindex-modal;
+  z-index: @zindex-modal-max;
   overflow: hidden;
   width: @modal-width;
   max-width: 90vw;
@@ -140,7 +140,7 @@
 
 .Popup-dialog {
   position: relative;
-  z-index: @zindex-popup;
+  z-index: @zindex-modal-max;
   overflow: hidden;
   width: 100%;
   border-radius: var(--radius-md) var(--radius-md) 0 0;
